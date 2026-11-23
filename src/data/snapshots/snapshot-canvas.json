@@ -1,0 +1,150 @@
+{
+  "id": "canvas",
+  "label": "图一抄录（第三方画布）",
+  "storyTime": "2025-03-15T10:12:00+08:00",
+  "source": "research-figure-1-ocr",
+  "notSameMomentAs": "runtime",
+  "notes": [
+    "浅灰底、蓝色虚线管；入口压力单位为 kPa。",
+    "与 runtime 产线照片非同一采样时刻，禁止拼成同一数据集。",
+    "坏点：valve.8=无数据→NODATA；valve.7=-0.75→BAD；不得驱动开度动画。"
+  ],
+  "presentation": {
+    "pipeColor": "blue-dashed",
+    "background": "light-gray"
+  },
+  "values": [
+    {
+      "id": "HG-UF-101.pressure",
+      "value": 4676.98,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-101.temperature",
+      "value": 39.55,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-101.cumStd",
+      "value": 31378607,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-101.cumWork",
+      "value": 645092,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-101.flowWork",
+      "value": 0,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-101.dp2",
+      "value": 0,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-102.pressure",
+      "value": 4676.52,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-102.temperature",
+      "value": 38.62,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-102.velocity",
+      "value": 0,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-102.flowWork",
+      "value": 0,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-102.flowStd",
+      "value": 0,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-UF-102.dp1",
+      "value": -0.06,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "elster.afterReg.temperature",
+      "value": 38.77,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "elster.afterReg.pressure",
+      "value": 1.06,
+      "quality": "UNCERTAIN",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "weisi.afterReg.temperature",
+      "value": 38.76,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "weisi.afterReg.pressure",
+      "value": 0.86,
+      "quality": "UNCERTAIN",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "outlet.temperature",
+      "value": 38,
+      "quality": "GOOD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "outlet.pressure",
+      "value": 1.06,
+      "quality": "UNCERTAIN",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "valve.7.opening",
+      "value": -0.75,
+      "quality": "BAD",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "valve.8.opening",
+      "value": null,
+      "quality": "NODATA",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-PCV10213.valveColor",
+      "value": null,
+      "quality": "NODATA",
+      "ts": "2025-03-15T10:12:00+08:00"
+    },
+    {
+      "id": "HG-PCV10223.valveColor",
+      "value": null,
+      "quality": "NODATA",
+      "ts": "2025-03-15T10:12:00+08:00"
+    }
+  ]
+}

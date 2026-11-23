@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "scene": "typical-energy-station",
+  "modelingClass": "典型场景建模",
+  "disclaimer": "无现场总平面/断面图纸。轮廓与尺寸取户外储能电站常见柜式/油浸变量级，不得作为施工图。",
+  "units": "m",
+  "coordinate": {
+    "gltf": "Y-up, right-handed, metres; origin = footprint bottom-centre",
+    "site": "+X east, +Z south-to-north in glTF (node translation x,z); +Y up",
+    "blender": "If opened in Blender, glTF importer maps Y-up → Blender Z-up",
+    "threejs": "GLTFLoader keeps Y-up; traverse userData.entityId",
+    "picking": "Stable entityId lives on the equipment ROOT node extras / userData"
+  },
+  "pairs": [
+    {
+      "group": "ES-PAIR-A",
+      "pcs": "ES-PCS-01",
+      "bess": [
+        "ES-BESS-A1",
+        "ES-BESS-A2",
+        "ES-BESS-A3",
+        "ES-BESS-A4"
+      ]
+    },
+    {
+      "group": "ES-PAIR-B",
+      "pcs": "ES-PCS-02",
+      "bess": [
+        "ES-BESS-B1",
+        "ES-BESS-B2",
+        "ES-BESS-B3",
+        "ES-BESS-B4"
+      ]
+    }
+  ],
+  "demoPowerKw": {
+    "incoming": 1100,
+    "loss": 20,
+    "bessDischarge": 200,
+    "load": 1280,
+    "note": "演示口径，来自公众号典型场景，非现场测点"
+  },
+  "catalog": [
+    {
+      "file": "catalog/pcs.glb",
+      "entityId": "ES-PCS-02",
+      "entityType": "pcs",
+      "catalogKind": "PCS",
+      "displayName": "PCS-02 储能变流器",
+      "size_m": {
+        "x": 1.55,
+        "y": 2.22,
+        "z": 1.1
+      },
+      "pairRole": "pcs",
+      "pairGroup": "ES-PAIR-B",
+      "pairedEntityIds": [
+        "ES-BESS-B1",
+        "ES-BESS-B2",
+        "ES-BESS-B3",
+        "ES-BESS-B4"
+      ],
+      "modelingClass": "典型场景建模"
+    },
+    {
+      "file": "catalog/transformer.glb",
+      "entityId": "ES-XFMR",
+      "entityType": "transformer",
+      "catalogKind": "TRANSFORMER",
+      "displayName": "变压器",
+      "size_m": {
+        "x": 3.2,
+        "y": 2.55,
+        "z": 2.2
+      },
+      "modelingClass": "典型场景建模"
+    },
+    {
+      "file": "catalog/bess.glb",
+      "entityId": "ES-BESS",
+      "entityType": "bess",
+      "catalogKind": "BESS",
+      "displayName": "储能柜",
+      "size_m": {
+        "x": 1.55,
+        "y": 2.55,
+        "z": 1.55
+      },
+      "pairRole": "bess",
+      "pairGroup": "ES-PAIR-B",
+      "pairedPcsId": "ES-PCS-02",
+      "modelingClass": "典型场景建模"
+    },
+    {
+      "file": "catalog/load.glb",
+      "entityId": "ES-LOAD",
+      "entityType": "load",
+      "catalogKind": "LOAD",
+      "displayName": "主要负荷",
+      "size_m": {
+        "x": 8.6,
+        "y": 5.7,
+        "z": 6.6
+      },
+      "modelingClass": "典型场景建模"
+    },
+    {
+      "file": "catalog/dist-room.glb",
+      "entityId": "ES-DIST-01",
+      "entityType": "distribution_room",
+      "catalogKind": "DIST_ROOM",
+      "displayName": "配电房",
+      "size_m": {
+        "x": 10.4,
+        "y": 4.0,
+        "z": 7.4
+      },
+      "modelingClass": "典型场景建模"
+    }
+  ],
+  "sceneEntities": [
+    {
+      "entityId": "ES-DIST-01",
+      "kind": "DIST_ROOM",
+      "label": "配电房",
+      "x": 8.0,
+      "z": 27.5,
+      "pairGroup": null
+    },
+    {
+      "entityId": "ES-XFMR-01",
+      "kind": "TRANSFORMER",
+      "label": "变压器",
+      "x": 16.5,
+      "z": 27.5,
+      "pairGroup": null
+    },
+    {
+      "entityId": "ES-PCS-01",
+      "kind": "PCS",
+      "label": "PCS-01",
+      "x": 23.5,
+      "z": 27.2,
+      "pairGroup": "ES-PAIR-A",
+      "peers": [
+        "ES-BESS-A1",
+        "ES-BESS-A2",
+        "ES-BESS-A3",
+        "ES-BESS-A4"
+      ]
+    },
+    {
+      "entityId": "ES-PCS-02",
+      "kind": "PCS",
+      "label": "PCS-02",
+      "x": 27.5,
+      "z": 27.2,
+      "pairGroup": "ES-PAIR-B",
+      "peers": [
+        "ES-BESS-B1",
+        "ES-BESS-B2",
+        "ES-BESS-B3",
+        "ES-BESS-B4"
+      ]
+    },
+    {
+      "entityId": "ES-BESS-A1",
+      "kind": "BESS",
+      "label": "储能柜 A1",
+      "x": 8.0,
+      "z": 16.0,
+      "pairGroup": "ES-PAIR-A",
+      "pcs": "ES-PCS-01"
+    },
+    {
+      "entityId": "ES-BESS-A2",
+      "kind": "BESS",
+      "label": "储能柜 A2",
+      "x": 10.5,
+      "z": 16.0,
+      "pairGroup": "ES-PAIR-A",
+      "pcs": "ES-PCS-01"
+    },
+    {
+      "entityId": "ES-BESS-A3",
+      "kind": "BESS",
+      "label": "储能柜 A3",
+      "x": 8.0,
+      "z": 18.5,
+      "pairGroup": "ES-PAIR-A",
+      "pcs": "ES-PCS-01"
+    },
+    {
+      "entityId": "ES-BESS-A4",
+      "kind": "BESS",
+      "label": "储能柜 A4",
+      "x": 10.5,
+      "z": 18.5,
+      "pairGroup": "ES-PAIR-A",
+      "pcs": "ES-PCS-01"
+    },
+    {
+      "entityId": "ES-BESS-B1",
+      "kind": "BESS",
+      "label": "储能柜 B1",
+      "x": 24.0,
+      "z": 16.0,
+      "pairGroup": "ES-PAIR-B",
+      "pcs": "ES-PCS-02"
+    },
+    {
+      "entityId": "ES-BESS-B2",
+      "kind": "BESS",
+      "label": "储能柜 B2",
+      "x": 26.5,
+      "z": 16.0,
+      "pairGroup": "ES-PAIR-B",
+      "pcs": "ES-PCS-02"
+    },
+    {
+      "entityId": "ES-BESS-B3",
+      "kind": "BESS",
+      "label": "储能柜 B3",
+      "x": 24.0,
+      "z": 18.5,
+      "pairGroup": "ES-PAIR-B",
+      "pcs": "ES-PCS-02"
+    },
+    {
+      "entityId": "ES-BESS-B4",
+      "kind": "BESS",
+      "label": "储能柜 B4",
+      "x": 26.5,
+      "z": 18.5,
+      "pairGroup": "ES-PAIR-B",
+      "pcs": "ES-PCS-02"
+    },
+    {
+      "entityId": "ES-LOAD-01",
+      "kind": "LOAD",
+      "label": "主要负荷",
+      "x": 12.0,
+      "z": 6.0,
+      "pairGroup": null
+    }
+  ],
+  "nonInteractive": [
+    "Site",
+    "roads",
+    "fence",
+    "pads",
+    "cable trays",
+    "pipes"
+  ]
+}

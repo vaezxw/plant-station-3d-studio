@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "notes": [
+    "编排配置：tag + 可选 kind + 可选 x/y/z。",
+    "场景内可拖设备、目录可放置；松手/下载写入本结构（亦存 localStorage）。",
+    "脚手架 editMode 只拖 2D 区块，不是三维设备。",
+    "连通关系仍以 topology.ts 为准；此处覆盖摆位与类型预设。"
+  ],
+  "nodes": [
+    { "tag": "HG-HOV10111", "kind": "HOV", "x": 0, "y": 2, "z": 0 },
+    { "tag": "HG-FS-101", "kind": "FS", "x": 1, "y": 2, "z": 0 },
+    { "tag": "HG-UF-101", "kind": "UF", "x": 2, "y": 2, "z": 0 },
+    { "tag": "HG-MOV10112", "kind": "MOV", "x": 3, "y": 2, "z": 0 },
+    { "tag": "HG-HOV10114", "kind": "HOV", "x": 4, "y": 2, "z": 0 },
+    { "tag": "HG-MOV10211", "kind": "MOV", "x": 5, "y": 2, "z": 0 },
+    { "tag": "HG-SSV10212", "kind": "SSV", "x": 6, "y": 2, "z": 0 },
+    { "tag": "HG-PCV10213", "kind": "PCV", "x": 7, "y": 2, "z": 0 },
+    { "tag": "HG-PV10214", "kind": "PV", "x": 8, "y": 2, "z": 0 },
+    { "tag": "HG-PV10215", "kind": "PV", "x": 9, "y": 2, "z": 0 },
+    { "tag": "HG-HOV10121", "kind": "HOV", "x": 0, "y": 0, "z": 0 },
+    { "tag": "HG-FS-102", "kind": "FS", "x": 1, "y": 0, "z": 0 },
+    { "tag": "HG-UF-102", "kind": "UF", "x": 2, "y": 0, "z": 0 },
+    { "tag": "HG-MOV10122", "kind": "MOV", "x": 3, "y": 0, "z": 0 },
+    { "tag": "HG-MOV10221", "kind": "MOV", "x": 4, "y": 0, "z": 0 },
+    { "tag": "HG-SSV10222", "kind": "SSV", "x": 5, "y": 0, "z": 0 },
+    { "tag": "HG-PCV10223", "kind": "PCV", "x": 6, "y": 0, "z": 0 },
+    { "tag": "HG-PV10224", "kind": "PV", "x": 7, "y": 0, "z": 0 },
+    { "tag": "HG-MOV10225", "kind": "MOV", "x": 8, "y": 0, "z": 0 },
+    { "tag": "HG-HOV10321", "kind": "HOV", "x": 9.5, "y": 0, "z": 0 },
+    { "tag": "HG-MOV10311", "kind": "MOV", "x": 10, "y": 1, "z": 0 },
+    { "tag": "HG-HOV10312", "kind": "HOV", "x": 12, "y": 1, "z": 0 }
+  ]
+}
