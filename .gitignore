@@ -1,0 +1,10 @@
+node_modules
+dist
+.env*
+*.local
+tools/blender*
+blender/**/tools
+*.blend1
+*.glb
+*.blend
+blender/**/export/**
