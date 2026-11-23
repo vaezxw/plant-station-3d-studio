@@ -5,6 +5,6 @@ dist
 tools/blender*
 blender/**/tools
 *.blend1
-*.glb
-*.blend
-blender/**/export/**
+blender-*.zip
+blender.exe
+**/blender.exe
