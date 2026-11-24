@@ -110,11 +110,12 @@ export type SelectionVisual = {
 
 export function createSelectionVisual(): SelectionVisual {
   let outline: THREE.LineSegments | null = null;
-  let previousEmissive: {
+  let boxHelper: THREE.BoxHelper | null = null;
+  let previousEmissives: Array<{
     mat: THREE.MeshStandardMaterial;
     color: THREE.Color;
     intensity: number;
-  } | null = null;
+  }> = [];
   let previousLabel: HTMLElement | null = null;
 
   const clear = () => {
@@ -124,11 +125,16 @@ export function createSelectionVisual(): SelectionVisual {
       (outline.material as THREE.Material).dispose();
       outline = null;
     }
-    if (previousEmissive) {
-      previousEmissive.mat.emissive.copy(previousEmissive.color);
-      previousEmissive.mat.emissiveIntensity = previousEmissive.intensity;
-      previousEmissive = null;
+    if (boxHelper) {
+      boxHelper.parent?.remove(boxHelper);
+      boxHelper.dispose();
+      boxHelper = null;
     }
+    for (const prev of previousEmissives) {
+      prev.mat.emissive.copy(prev.color);
+      prev.mat.emissiveIntensity = prev.intensity;
+    }
+    previousEmissives = [];
     if (previousLabel) {
       styleCss2dTagLabel(previousLabel, false);
       previousLabel = null;
@@ -141,11 +147,11 @@ export function createSelectionVisual(): SelectionVisual {
 
     const body = object.getObjectByName(`${tag}::body`);
     if (body instanceof THREE.Mesh && body.material instanceof THREE.MeshStandardMaterial) {
-      previousEmissive = {
+      previousEmissives.push({
         mat: body.material,
         color: body.material.emissive.clone(),
         intensity: body.material.emissiveIntensity,
-      };
+      });
       body.material.emissive.setHex(0x22d3ee);
       body.material.emissiveIntensity = 0.85;
 
@@ -158,6 +164,26 @@ export function createSelectionVisual(): SelectionVisual {
       outline.rotation.copy(body.rotation);
       outline.scale.copy(body.scale);
       object.add(outline);
+    } else {
+      // GLB 模板通常是 Group，使用 BoxHelper 并给子 Mesh 叠加轻微高亮
+      const seenMats = new Set<THREE.MeshStandardMaterial>();
+      object.traverse((child) => {
+        if (!(child instanceof THREE.Mesh)) return;
+        const mats = Array.isArray(child.material) ? child.material : [child.material];
+        for (const m of mats) {
+          if (!(m instanceof THREE.MeshStandardMaterial) || seenMats.has(m)) continue;
+          seenMats.add(m);
+          previousEmissives.push({
+            mat: m,
+            color: m.emissive.clone(),
+            intensity: m.emissiveIntensity,
+          });
+          m.emissive.setHex(0x22d3ee);
+          m.emissiveIntensity = Math.max(m.emissiveIntensity, 0.35);
+        }
+      });
+      boxHelper = new THREE.BoxHelper(object, 0x38bdf8);
+      (object.parent ?? object).add(boxHelper);
     }
 
     const el = labelFromEquipment(object)?.element ?? null;

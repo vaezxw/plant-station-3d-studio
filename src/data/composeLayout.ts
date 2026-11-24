@@ -24,6 +24,10 @@ export const COMPOSE_LAYOUT_FILE = composeFile as ComposeLayoutFile;
 
 export const COMPOSE_STORAGE_KEY = 'hengguang.compose-layout.v1';
 
+export function composeStorageKey(slotId = 'scene'): string {
+  return `hengguang.compose-layout.v2:${slotId}`;
+}
+
 export function composeOverrideMap(
   file: ComposeLayoutFile = COMPOSE_LAYOUT_FILE,
 ): Map<string, ComposeNodeOverride> {
@@ -73,43 +77,67 @@ export function createEmptyDraft(base: ComposeLayoutFile = COMPOSE_LAYOUT_FILE):
   };
 }
 
-export function loadDraftFromStorage(): ComposeLayoutFile | null {
+function parseDraft(raw: string | null): ComposeLayoutFile | null {
+  if (!raw) return null;
+  const parsed = JSON.parse(raw) as ComposeLayoutFile;
+  if (!parsed || !Array.isArray(parsed.nodes)) return null;
+  return parsed;
+}
+
+export function loadDraftFromStorage(slotId = 'scene'): ComposeLayoutFile | null {
   try {
-    const raw = localStorage.getItem(COMPOSE_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as ComposeLayoutFile;
-    if (!parsed || !Array.isArray(parsed.nodes)) return null;
-    return parsed;
+    const keyed = parseDraft(localStorage.getItem(composeStorageKey(slotId)));
+    if (keyed) return keyed;
+    if (slotId === 'scene') {
+      return parseDraft(localStorage.getItem(COMPOSE_STORAGE_KEY));
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-export function saveDraftToStorage(draft: ComposeLayoutFile): void {
+export function saveDraftToStorage(draft: ComposeLayoutFile, slotId = 'scene'): void {
   try {
-    localStorage.setItem(COMPOSE_STORAGE_KEY, JSON.stringify(draft));
+    localStorage.setItem(composeStorageKey(slotId), JSON.stringify(draft));
   } catch {
     // 忽略配额/隐私模式
   }
 }
 
-export function clearDraftStorage(): void {
+export function clearDraftStorage(slotId = 'scene'): void {
   try {
-    localStorage.removeItem(COMPOSE_STORAGE_KEY);
+    localStorage.removeItem(composeStorageKey(slotId));
+    if (slotId === 'scene') {
+      localStorage.removeItem(COMPOSE_STORAGE_KEY);
+    }
   } catch {
     // ignore
   }
 }
 
 /** 启动时：localStorage 里已放的 UF/能源站等保留；冻结拓扑位号改由「恒光橇装」拖入 */
-export function createInitialDraft(): ComposeLayoutFile {
-  const stored = loadDraftFromStorage();
+export function createInitialDraft(slotId = 'scene'): ComposeLayoutFile {
+  const stored = loadDraftFromStorage(slotId);
   if (!stored) return createEmptyDraft();
   return {
     version: stored.version ?? 1,
     notes: stored.notes?.length ? stored.notes : createEmptyDraft().notes,
     nodes: stored.nodes.filter((n) => !isFrozenProcessTag(n.tag)),
   };
+}
+
+/** 根据已有实例编号计算下一个不冲突的递增位号 */
+export function nextPlaceTag(existingTags: Iterable<string>, prefix = 'HG-PLACE-'): string {
+  let maxSerial = 0;
+  for (const tag of existingTags) {
+    if (!tag.startsWith(prefix)) continue;
+    const num = Number.parseInt(tag.slice(prefix.length), 10);
+    if (Number.isFinite(num) && num > maxSerial) {
+      maxSerial = num;
+    }
+  }
+  return `${prefix}${String(maxSerial + 1).padStart(3, '0')}`;
 }
 
 export function upsertComposeNode(

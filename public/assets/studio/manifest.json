@@ -1,0 +1,27 @@
+{
+  "base": "/assets/studio",
+  "version": 3,
+  "files": {
+    "HENG_GUANG_SKID": "heng-guang-skid.glb",
+    "TANK": "tank.glb",
+    "FS": "fs.glb",
+    "METER_MEMBRANE": "meter-membrane.glb",
+    "METER_ROOTS": "meter-roots.glb",
+    "UF": "uf.glb",
+    "CALIBRATION_RIG": "calibration-rig.glb",
+    "CONVEYOR_LINE": "conveyor-line.glb",
+    "ROBOT_STATION": "robot-station.glb",
+    "LEAK_TEST_BENCH": "leak-test-bench.glb",
+    "LASER_MARKER": "laser-marker.glb",
+    "GAS_DETECTOR": "gas-detector.glb",
+    "ALARM_TOWER": "alarm-tower.glb",
+    "EXPLOSION_PANEL": "explosion-panel.glb",
+    "WATER_PUMP": "water-pump.glb",
+    "DOSING_TANK": "dosing-tank.glb",
+    "MAG_METER": "mag-meter.glb",
+    "HOV": "hov.glb",
+    "MOV": "mov.glb",
+    "SSV": "ssv.glb",
+    "PCV": "pcv.glb"
+  }
+}

@@ -1,0 +1,1022 @@
+{
+  "engine": "small-axial-turbojet",
+  "monitorOnly": true,
+  "axis": "gltf-y-up",
+  "blenderAxis": "Y-forward-Z-up",
+  "spin": {
+    "nodeName": "RotorSpool",
+    "axis": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "note": "Rotate RotorSpool around this glTF axis"
+  },
+  "clip": {
+    "planeNormal": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "constant": 0.0,
+    "groups": [
+      "casing"
+    ]
+  },
+  "parts": [
+    {
+      "partId": "shaft",
+      "name": "shaft",
+      "group": "rotor",
+      "labelZh": "主轴",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "spinner",
+      "name": "spinner",
+      "group": "rotor",
+      "labelZh": "进气锥",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.06
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.06,
+        0.0
+      ]
+    },
+    {
+      "partId": "bearing-fwd",
+      "name": "bearing-fwd",
+      "group": "rotor",
+      "labelZh": "前轴承",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "bearing-aft",
+      "name": "bearing-aft",
+      "group": "rotor",
+      "labelZh": "后轴承",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "inlet-lip",
+      "name": "inlet-lip",
+      "group": "casing",
+      "labelZh": "进气唇口",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.12
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.12,
+        0.0
+      ]
+    },
+    {
+      "partId": "inlet-duct",
+      "name": "inlet-duct",
+      "group": "casing",
+      "labelZh": "进气道",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.1
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.1,
+        0.0
+      ]
+    },
+    {
+      "partId": "inlet-flange-bolts",
+      "name": "inlet-flange-bolts",
+      "group": "casing",
+      "labelZh": "进气法兰螺栓",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.12
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.12,
+        0.0
+      ]
+    },
+    {
+      "partId": "igv",
+      "name": "igv",
+      "group": "stator",
+      "labelZh": "进口导叶",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.07
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.07,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-rotor-1",
+      "name": "comp-rotor-1",
+      "group": "rotor",
+      "labelZh": "压气机转子 1 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.052000000000000005
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.052000000000000005,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-stator-1",
+      "name": "comp-stator-1",
+      "group": "stator",
+      "labelZh": "压气机静子 1 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.028
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.028,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-rotor-2",
+      "name": "comp-rotor-2",
+      "group": "rotor",
+      "labelZh": "压气机转子 2 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.064
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.064,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-stator-2",
+      "name": "comp-stator-2",
+      "group": "stator",
+      "labelZh": "压气机静子 2 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.036000000000000004
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.036000000000000004,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-rotor-3",
+      "name": "comp-rotor-3",
+      "group": "rotor",
+      "labelZh": "压气机转子 3 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.07600000000000001
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.07600000000000001,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-stator-3",
+      "name": "comp-stator-3",
+      "group": "stator",
+      "labelZh": "压气机静子 3 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.044
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.044,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-rotor-4",
+      "name": "comp-rotor-4",
+      "group": "rotor",
+      "labelZh": "压气机转子 4 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.088
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.088,
+        0.0
+      ]
+    },
+    {
+      "partId": "comp-stator-4",
+      "name": "comp-stator-4",
+      "group": "stator",
+      "labelZh": "压气机静子 4 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.052000000000000005
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.052000000000000005,
+        0.0
+      ]
+    },
+    {
+      "partId": "diffuser",
+      "name": "diffuser",
+      "group": "stator",
+      "labelZh": "扩压器",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.02
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.02,
+        0.0
+      ]
+    },
+    {
+      "partId": "combustor-outer",
+      "name": "combustor-outer",
+      "group": "casing",
+      "labelZh": "燃烧室外衬",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.1,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.1,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "combustor-inner",
+      "name": "combustor-inner",
+      "group": "casing",
+      "labelZh": "燃烧室内衬",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "combustor-dome",
+      "name": "combustor-dome",
+      "group": "casing",
+      "labelZh": "燃烧室头部",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.08,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.08,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "swirl-cups",
+      "name": "swirl-cups",
+      "group": "casing",
+      "labelZh": "旋流杯",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.09,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.09,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "dilution-rings",
+      "name": "dilution-rings",
+      "group": "casing",
+      "labelZh": "掺混孔加强环",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.1,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.1,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "ngv-1",
+      "name": "ngv-1",
+      "group": "stator",
+      "labelZh": "导向器 1 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.04
+      ],
+      "explodeBlender": [
+        0.0,
+        0.04,
+        0.0
+      ]
+    },
+    {
+      "partId": "turb-rotor-1",
+      "name": "turb-rotor-1",
+      "group": "rotor",
+      "labelZh": "涡轮转子 1 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.06
+      ],
+      "explodeBlender": [
+        0.0,
+        0.06,
+        0.0
+      ]
+    },
+    {
+      "partId": "ngv-2",
+      "name": "ngv-2",
+      "group": "stator",
+      "labelZh": "导向器 2 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.07
+      ],
+      "explodeBlender": [
+        0.0,
+        0.07,
+        0.0
+      ]
+    },
+    {
+      "partId": "turb-rotor-2",
+      "name": "turb-rotor-2",
+      "group": "rotor",
+      "labelZh": "涡轮转子 2 级",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.09
+      ],
+      "explodeBlender": [
+        0.0,
+        0.09,
+        0.0
+      ]
+    },
+    {
+      "partId": "exhaust-cone",
+      "name": "exhaust-cone",
+      "group": "stator",
+      "labelZh": "尾锥",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.11
+      ],
+      "explodeBlender": [
+        0.0,
+        0.11,
+        0.0
+      ]
+    },
+    {
+      "partId": "nozzle",
+      "name": "nozzle",
+      "group": "casing",
+      "labelZh": "尾喷管",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        -0.14
+      ],
+      "explodeBlender": [
+        0.0,
+        0.14,
+        0.0
+      ]
+    },
+    {
+      "partId": "fwd-casing",
+      "name": "fwd-casing",
+      "group": "casing",
+      "labelZh": "压气机机匣",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.09,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.09
+      ]
+    },
+    {
+      "partId": "mid-casing",
+      "name": "mid-casing",
+      "group": "casing",
+      "labelZh": "中介机匣",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.12,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.12
+      ]
+    },
+    {
+      "partId": "aft-casing",
+      "name": "aft-casing",
+      "group": "casing",
+      "labelZh": "涡轮机匣",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.1,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.1
+      ]
+    },
+    {
+      "partId": "flange-fwd",
+      "name": "flange-fwd",
+      "group": "casing",
+      "labelZh": "压气机后法兰",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.09,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.09
+      ]
+    },
+    {
+      "partId": "flange-mid",
+      "name": "flange-mid",
+      "group": "casing",
+      "labelZh": "涡轮前法兰",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.12,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.12
+      ]
+    },
+    {
+      "partId": "flange-aft",
+      "name": "flange-aft",
+      "group": "casing",
+      "labelZh": "喷管法兰",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.1,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.1
+      ]
+    },
+    {
+      "partId": "accessory-gearbox",
+      "name": "accessory-gearbox",
+      "group": "casing",
+      "labelZh": "附件机匣",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        -0.12,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        -0.12
+      ]
+    },
+    {
+      "partId": "radial-drive",
+      "name": "radial-drive",
+      "group": "casing",
+      "labelZh": "径向传动轴",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        -0.1,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        -0.1
+      ]
+    },
+    {
+      "partId": "fuel-manifold",
+      "name": "fuel-manifold",
+      "group": "plumbing",
+      "labelZh": "燃油总管",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.14,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.14,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "fuel-injectors",
+      "name": "fuel-injectors",
+      "group": "plumbing",
+      "labelZh": "燃油喷嘴",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.13,
+        0.0,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.13,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "partId": "fuel-line",
+      "name": "fuel-line",
+      "group": "plumbing",
+      "labelZh": "供油管",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.16,
+        -0.04,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.16,
+        0.0,
+        -0.04
+      ]
+    },
+    {
+      "partId": "oil-line",
+      "name": "oil-line",
+      "group": "plumbing",
+      "labelZh": "滑油管",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        -0.14,
+        0.04,
+        -0.0
+      ],
+      "explodeBlender": [
+        -0.14,
+        0.0,
+        0.04
+      ]
+    },
+    {
+      "partId": "bleed-pipe",
+      "name": "bleed-pipe",
+      "group": "plumbing",
+      "labelZh": "引气管",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.04,
+        0.14,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.04,
+        0.0,
+        0.14
+      ]
+    },
+    {
+      "partId": "igniter",
+      "name": "igniter",
+      "group": "plumbing",
+      "labelZh": "点火电嘴",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.14,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        0.14
+      ]
+    },
+    {
+      "partId": "mount-ring-fwd",
+      "name": "mount-ring-fwd",
+      "group": "casing",
+      "labelZh": "前安装环",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        -0.08,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        -0.08
+      ]
+    },
+    {
+      "partId": "mount-ring-aft",
+      "name": "mount-ring-aft",
+      "group": "casing",
+      "labelZh": "后安装环",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        -0.08,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        -0.08
+      ]
+    },
+    {
+      "partId": "struts",
+      "name": "struts",
+      "group": "casing",
+      "labelZh": "安装撑杆",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        -0.14,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        -0.14
+      ]
+    },
+    {
+      "partId": "stand-base",
+      "name": "stand-base",
+      "group": "casing",
+      "labelZh": "试验台底座",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        -0.16,
+        -0.0
+      ],
+      "explodeBlender": [
+        0.0,
+        0.0,
+        -0.16
+      ]
+    },
+    {
+      "partId": "inlet-struts",
+      "name": "inlet-struts",
+      "group": "stator",
+      "labelZh": "进气支板",
+      "rest": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "explode": [
+        0.0,
+        0.0,
+        0.09
+      ],
+      "explodeBlender": [
+        0.0,
+        -0.09,
+        0.0
+      ]
+    }
+  ],
+  "counts": {
+    "parts": 47,
+    "rotor": 10,
+    "stator": 10,
+    "casing": 21,
+    "plumbing": 6
+  }
+}

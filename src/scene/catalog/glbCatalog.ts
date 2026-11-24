@@ -97,22 +97,6 @@ function normalizeTemplate(root: THREE.Object3D, kind: CatalogKind): THREE.Objec
   return root;
 }
 
-async function fetchUrlExists(url: string): Promise<boolean> {
-  try {
-    const head = await fetch(url, { method: 'HEAD', cache: 'no-cache' });
-    if (head.ok) return true;
-    // 部分静态服对 HEAD 不友好，再试 GET range
-    const get = await fetch(url, {
-      method: 'GET',
-      headers: { Range: 'bytes=0-0' },
-      cache: 'no-cache',
-    });
-    return get.ok || get.status === 206;
-  } catch {
-    return false;
-  }
-}
-
 async function loadGlbUrl(url: string, kind: CatalogKind): Promise<THREE.Object3D | null> {
   const loader = new GLTFLoader();
   try {
@@ -137,8 +121,6 @@ async function ensureKind(kind: CatalogKind, url: string): Promise<THREE.Object3
   if (existing) return existing;
 
   const job = (async () => {
-    const ok = await fetchUrlExists(url);
-    if (!ok) return null;
     const root = await loadGlbUrl(url, kind);
     if (root) {
       templates.set(kind, root);
@@ -155,7 +137,7 @@ type GlbManifest = Partial<Record<CatalogKind, string>> & { base?: string };
 
 async function loadManifest(url: string): Promise<GlbManifest | null> {
   try {
-    const res = await fetch(url, { cache: 'no-cache' });
+    const res = await fetch(url);
     if (!res.ok) return null;
     return (await res.json()) as GlbManifest;
   } catch {

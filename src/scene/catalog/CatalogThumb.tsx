@@ -16,6 +16,7 @@ type ThumbSlot = {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   hovered: boolean;
+  visible: boolean;
   angle: number;
 };
 
@@ -40,7 +41,7 @@ class ThumbHub {
       canvas,
       antialias: true,
       alpha: true,
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: false,
     });
     this.renderer.setSize(THUMB_W, THUMB_H, false);
     this.renderer.setPixelRatio(1);
@@ -110,6 +111,7 @@ class ThumbHub {
 
   private render(dt: number) {
     for (const slot of this.slots) {
+      if (!slot.visible) continue;
       const entry = this.scenes.get(slot.kind);
       if (!entry) continue;
       const speed = slot.hovered ? HOVER_SPEED : IDLE_SPEED;
@@ -170,13 +172,27 @@ const CatalogThumb: FC<Props> = ({ kind, style }) => {
       canvas,
       ctx,
       hovered: false,
+      visible: true,
       angle: Math.random() * 0.6,
     };
     slotRef.current = slot;
     const h = getHub();
     h.add(slot);
     const unsub = subscribeGlbCatalog(() => h.invalidate(kind));
+    const io =
+      typeof IntersectionObserver !== 'undefined'
+        ? new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                slot.visible = entry.isIntersecting;
+              }
+            },
+            { threshold: 0.01 },
+          )
+        : null;
+    io?.observe(canvas);
     return () => {
+      io?.disconnect();
       unsub();
       h.remove(slot);
       slotRef.current = null;
