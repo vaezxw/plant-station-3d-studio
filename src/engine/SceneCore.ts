@@ -1,18 +1,18 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { getCatalogItem, type CatalogKind } from '../domain/catalog';
-import type { PipeEdge, SceneNode, TransformTool, Vec3 } from '../domain/schema';
-import type { StudioScene3DTheme } from '../domain/themes';
-import { getSkidFlow } from '../scene/hengGuangSkid';
-import type { PipeFlowAnimator } from '../scene/flow';
+import type { PointValue } from '../data/points';
 import {
-  attachTurbojetRig,
-  getTurbojetMapping,
-  type TurbojetRig,
-} from '../scene/turbojet/createTurbojetViewer';
+  createDefaultGroundConfig,
+  type GroundConfig,
+  type PipeEdge,
+  type SceneNode,
+  type TransformTool,
+  type Vec3,
+} from '../domain/schema';
+import type { StudioScene3DTheme } from '../domain/themes';
 import type { CameraPresetView } from '../store/useEditorStore';
 import {
   disposeAssetObject,
@@ -20,8 +20,25 @@ import {
   getAssetSourceKey,
   instantiateAssetObject,
 } from './AssetManager';
-import { buildPipeMesh, disposeBuiltPipe, resolvePortWorld, type BuiltPipe } from './PipeSystem';
+import { applyGroundStyleToMaterial, createIndustrialEnvTexture } from './MaterialLibrary';
+import {
+  attachNodePipeFlow,
+  buildPipeMesh,
+  disposeBuiltPipe,
+  disposeNodePipeFlow,
+  resolvePortWorld,
+  setPipeSelectedHighlight,
+  tickBuiltPipeFlow,
+  tickNodePipeFlow,
+  type BuiltPipe,
+  type NodePipeFlowHandle,
+} from './PipeSystem';
 import { exportGroupToGlb } from './SceneExporter';
+import {
+  attachTurbojetRig,
+  getTurbojetMapping,
+  type TurbojetRig,
+} from './turbojet/createTurbojetViewer';
 
 type NodeEntry = {
   node: SceneNode;
@@ -29,7 +46,7 @@ type NodeEntry = {
   object: THREE.Object3D;
   label: CSS2DObject;
   labelEl: HTMLDivElement;
-  flow: PipeFlowAnimator | null;
+  nodeFlow: NodePipeFlowHandle | null;
   rig: TurbojetRig | null;
 };
 
@@ -62,8 +79,12 @@ export class SceneCore {
   private pmrem: THREE.PMREMGenerator;
   private envRT: THREE.WebGLRenderTarget;
 
+  private groundGroup = new THREE.Group();
   private groundMesh: THREE.Mesh;
+  private groundBorderGroup = new THREE.Group();
   private groundMat: THREE.MeshStandardMaterial;
+  private groundConfig: GroundConfig = createDefaultGroundConfig();
+  private lastTheme: StudioScene3DTheme;
   private gridMajor: THREE.GridHelper | null = null;
   private gridMinor: THREE.GridHelper | null = null;
   private gridGroup = new THREE.Group();
@@ -76,6 +97,8 @@ export class SceneCore {
   private entries = new Map<string, NodeEntry>();
   private pipeList: PipeEdge[] = [];
   private builtPipes = new Map<string, BuiltPipe>();
+  private selectedPipeId: string | null = null;
+  private telemetryMap: Record<string, PointValue> = {};
   private pendingPipeStart: { nodeId: string; portId: string; marker: THREE.Mesh } | null = null;
   private selectionBox: THREE.BoxHelper | null = null;
   private directDrag = {
@@ -114,11 +137,12 @@ export class SceneCore {
   constructor(host: HTMLElement, initialTheme: StudioScene3DTheme, callbacks: SceneCallbacks) {
     this.host = host;
     this.callbacks = callbacks;
+    this.lastTheme = initialTheme;
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(initialTheme.background);
     this.scene.fog = new THREE.FogExp2(initialTheme.fogColor, initialTheme.fogDensity);
-    this.scene.environmentIntensity = initialTheme.envIntensity;
+    this.scene.environmentIntensity = Math.max(initialTheme.envIntensity, 1.1);
 
     const w = Math.max(1, host.clientWidth);
     const h = Math.max(1, host.clientHeight);
@@ -131,7 +155,7 @@ export class SceneCore {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.toneMappingExposure = 1.08;
     this.renderer.localClippingEnabled = true;
     this.renderer.domElement.style.display = 'block';
     this.renderer.domElement.style.width = '100%';
@@ -139,7 +163,7 @@ export class SceneCore {
     host.appendChild(this.renderer.domElement);
 
     this.pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.envRT = this.pmrem.fromScene(new RoomEnvironment(), 0.04);
+    this.envRT = createIndustrialEnvTexture(this.renderer, this.pmrem);
     this.scene.environment = this.envRT.texture;
 
     this.css2d = new CSS2DRenderer();
@@ -149,38 +173,44 @@ export class SceneCore {
     this.css2d.domElement.style.pointerEvents = 'none';
     host.appendChild(this.css2d.domElement);
 
-    // 三点光照明
-    const hemi = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.65);
+    // 重工业厂房多向照明（强调不锈钢纵向高光与阴影区螺栓轮廓）
+    const hemi = new THREE.HemisphereLight(0xdbeafe, 0x162030, 0.55);
     this.scene.add(hemi);
 
-    const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.85);
-    keyLight.position.set(8, 14, 9);
+    const keyLight = new THREE.DirectionalLight(0xf8fafc, 2.05);
+    keyLight.position.set(8.5, 15, 9.5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(2048, 2048);
     keyLight.shadow.camera.near = 1;
-    keyLight.shadow.camera.far = 45;
-    keyLight.shadow.camera.left = -14;
-    keyLight.shadow.camera.right = 14;
-    keyLight.shadow.camera.top = 14;
-    keyLight.shadow.camera.bottom = -14;
-    keyLight.shadow.bias = -0.0005;
+    keyLight.shadow.camera.far = 48;
+    keyLight.shadow.camera.left = -16;
+    keyLight.shadow.camera.right = 16;
+    keyLight.shadow.camera.top = 16;
+    keyLight.shadow.camera.bottom = -16;
+    keyLight.shadow.bias = -0.0004;
     this.scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0x60a5fa, 0.7);
-    rimLight.position.set(-9, 6, -8);
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.92);
+    rimLight.position.set(-10, 7, -9);
     this.scene.add(rimLight);
 
-    // 接收阴影的科技混凝土地坪
+    const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.42);
+    fillLight.position.set(-8, 3.2, 10);
+    this.scene.add(fillLight);
+
+    // 可配置工业地坪组件（始终位于网格下方，与可切换的网格地面独立协作）
     this.groundMat = new THREE.MeshStandardMaterial({
       color: initialTheme.groundColor,
-      roughness: 0.88,
-      metalness: 0.08,
+      roughness: this.groundConfig.roughness,
+      metalness: this.groundConfig.metalness,
     });
-    this.groundMesh = new THREE.Mesh(new THREE.CircleGeometry(48, 64), this.groundMat);
+    this.groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(32, 24), this.groundMat);
     this.groundMesh.rotation.x = -Math.PI / 2;
-    this.groundMesh.position.y = -0.002;
+    this.groundMesh.position.y = -0.004;
     this.groundMesh.receiveShadow = true;
-    this.scene.add(this.groundMesh);
+    this.groundGroup.add(this.groundMesh, this.groundBorderGroup);
+    this.scene.add(this.groundGroup);
+    this.applyGroundConfig(this.groundConfig);
 
     this.scene.add(this.gridGroup);
     this.rebuildGrids(initialTheme.gridPrimary, initialTheme.gridSecondary);
@@ -527,6 +557,86 @@ export class SceneCore {
     this.callbacks.onSelectNode(nodeId, partLabel);
   };
 
+  private clearGroundBorder() {
+    while (this.groundBorderGroup.children.length > 0) {
+      const c = this.groundBorderGroup.children[0];
+      this.groundBorderGroup.remove(c);
+      if (c instanceof THREE.Mesh) {
+        c.geometry.dispose();
+        if (Array.isArray(c.material)) c.material.forEach((m) => m.dispose());
+        else c.material.dispose();
+      }
+    }
+  }
+
+  /** 应用可配置厂房地坪参数，始终独立于网格地面，确保网格地面保留 */
+  applyGroundConfig(cfg?: GroundConfig) {
+    const next = cfg ? { ...cfg } : createDefaultGroundConfig();
+    this.groundConfig = next;
+
+    if (!next.enabled || next.style === 'grid-only') {
+      this.groundGroup.visible = false;
+      this.rebuildGrids(this.lastTheme.gridPrimary, this.lastTheme.gridSecondary);
+      return;
+    }
+
+    this.groundGroup.visible = true;
+    const width = Math.max(8, next.width);
+    const depth = Math.max(8, next.depth);
+
+    this.groundMesh.geometry.dispose();
+    if (next.shape === 'circle') {
+      this.groundMesh.geometry = new THREE.CircleGeometry(width * 0.5, 64);
+    } else {
+      this.groundMesh.geometry = new THREE.PlaneGeometry(width, depth);
+    }
+
+    const repX = Math.max(2, Math.round(width / 4));
+    const repZ = Math.max(2, Math.round((next.shape === 'circle' ? width : depth) / 4));
+    applyGroundStyleToMaterial(
+      this.groundMat,
+      next.style,
+      repX,
+      repZ,
+      next.roughness,
+      next.metalness,
+    );
+
+    this.clearGroundBorder();
+    if (next.showBorder) {
+      const borderMat = new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        metalness: 0.78,
+        roughness: 0.34,
+      });
+      if (next.shape === 'circle') {
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry(width * 0.5 - 0.14, width * 0.5 + 0.04, 64),
+          borderMat,
+        );
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.y = -0.002;
+        this.groundBorderGroup.add(ring);
+      } else {
+        const t = 0.12;
+        const h = 0.014;
+        const bars: [number, number, number, number][] = [
+          [width + t * 2, t, 0, depth * 0.5 + t * 0.5],
+          [width + t * 2, t, 0, -(depth * 0.5 + t * 0.5)],
+          [t, depth, -(width * 0.5 + t * 0.5), 0],
+          [t, depth, width * 0.5 + t * 0.5, 0],
+        ];
+        for (const [bw, bd, bx, bz] of bars) {
+          const m = new THREE.Mesh(new THREE.BoxGeometry(bw, h, bd), borderMat);
+          m.position.set(bx, -0.003, bz);
+          this.groundBorderGroup.add(m);
+        }
+      }
+    }
+
+    this.rebuildGrids(this.lastTheme.gridPrimary, this.lastTheme.gridSecondary);
+  }
+
   private rebuildGrids(primaryHex: string, secondaryHex: string) {
     if (this.gridMajor) {
       this.gridGroup.remove(this.gridMajor);
@@ -536,24 +646,30 @@ export class SceneCore {
       this.gridGroup.remove(this.gridMinor);
       this.gridMinor.dispose();
     }
-    this.gridMinor = new THREE.GridHelper(32, 64, secondaryHex, secondaryHex);
-    this.gridMinor.position.y = 0.001;
-    (this.gridMinor.material as THREE.Material).transparent = true;
-    (this.gridMinor.material as THREE.Material).opacity = 0.42;
+    const maxSpan = Math.max(32, this.groundConfig.width + 6, this.groundConfig.depth + 6);
+    const gridSize = Math.ceil(maxSpan / 4) * 4;
 
-    this.gridMajor = new THREE.GridHelper(32, 16, primaryHex, primaryHex);
-    this.gridMajor.position.y = 0.002;
+    this.gridMinor = new THREE.GridHelper(gridSize, gridSize * 2, secondaryHex, secondaryHex);
+    this.gridMinor.position.y = 0.002;
+    (this.gridMinor.material as THREE.Material).transparent = true;
+    (this.gridMinor.material as THREE.Material).opacity = 0.45;
+
+    this.gridMajor = new THREE.GridHelper(gridSize, Math.round(gridSize / 2), primaryHex, primaryHex);
+    this.gridMajor.position.y = 0.004;
     (this.gridMajor.material as THREE.Material).transparent = true;
-    (this.gridMajor.material as THREE.Material).opacity = 0.65;
+    (this.gridMajor.material as THREE.Material).opacity = 0.72;
 
     this.gridGroup.add(this.gridMinor, this.gridMajor);
   }
 
   applyTheme(theme: StudioScene3DTheme) {
+    this.lastTheme = theme;
     this.scene.background = new THREE.Color(theme.background);
     this.scene.fog = new THREE.FogExp2(theme.fogColor, theme.fogDensity);
-    this.scene.environmentIntensity = theme.envIntensity;
-    this.groundMat.color.set(theme.groundColor);
+    this.scene.environmentIntensity = Math.max(theme.envIntensity, 1.05);
+    if (!this.groundConfig.enabled || this.groundConfig.style === 'grid-only') {
+      this.groundMat.color.set(theme.groundColor);
+    }
     this.rebuildGrids(theme.gridPrimary, theme.gridSecondary);
   }
 
@@ -629,6 +745,17 @@ export class SceneCore {
     this.syncTransformAttachment();
   }
 
+  setSelectedPipe(pipeId: string | null) {
+    this.selectedPipeId = pipeId;
+    for (const bp of this.builtPipes.values()) {
+      setPipeSelectedHighlight(bp, bp.id === pipeId);
+    }
+  }
+
+  setTelemetryMap(map: Record<string, PointValue>) {
+    this.telemetryMap = map;
+  }
+
   private syncTransformAttachment() {
     if (
       !this.interactive ||
@@ -660,7 +787,7 @@ export class SceneCore {
         if (this.transform.object === entry.object) this.transform.detach();
         this.nodesGroup.remove(entry.object);
         this.labelsGroup.remove(entry.label);
-        entry.flow?.dispose();
+        if (entry.nodeFlow) disposeNodePipeFlow(entry.nodeFlow);
         disposeAssetObject(entry.object);
         this.entries.delete(id);
       }
@@ -668,7 +795,16 @@ export class SceneCore {
 
     for (const node of nodes) {
       const sourceKey = getAssetSourceKey(node.kind, node.customGlbId);
-      const sig = `${node.kind}|${node.customGlbId ?? ''}|${node.color ?? ''}|${node.labelText ?? ''}|${sourceKey}`;
+      const scaleTag =
+        node.kind === 'FLOOR_SLAB' || node.kind === 'BASE_PAD'
+          ? `${Math.round(node.scale[0] * 2)}:${Math.round(node.scale[2] * 2)}`
+          : '';
+      const textSig = node.kind === 'TEXT' ? `${node.tag}|${node.section}` : '';
+      const pipeFlowSig =
+        node.kind === 'PIPE' || node.kind === 'PIPE_ELBOW' || node.kind === 'SIGHT_GLASS'
+          ? JSON.stringify(node.pipeFlow ?? null)
+          : '';
+      const sig = `${node.kind}|${node.customGlbId ?? ''}|${node.color ?? ''}|${node.floorStyle ?? ''}|${scaleTag}|${textSig}|${pipeFlowSig}|${node.labelText ?? ''}|${sourceKey}`;
       const existing = this.entries.get(node.id);
       if (existing && existing.sig === sig) {
         existing.node = node;
@@ -686,7 +822,7 @@ export class SceneCore {
         if (this.transform.object === existing.object) this.transform.detach();
         this.nodesGroup.remove(existing.object);
         this.labelsGroup.remove(existing.label);
-        existing.flow?.dispose();
+        if (existing.nodeFlow) disposeNodePipeFlow(existing.nodeFlow);
         disposeAssetObject(existing.object);
       }
 
@@ -694,8 +830,11 @@ export class SceneCore {
         nodeId: node.id,
         tag: node.tag,
         labelText: node.labelText ?? node.tag,
+        section: node.section,
         customGlbId: node.customGlbId,
         colorHex: node.color,
+        floorStyle: node.floorStyle,
+        scale: node.scale,
       });
       object.position.set(...node.position);
       object.rotation.set(...node.rotation);
@@ -709,7 +848,7 @@ export class SceneCore {
         if (mapping) rig = attachTurbojetRig(object, mapping);
       }
 
-      const flow = getSkidFlow(object);
+      const nodeFlow = attachNodePipeFlow(object, node);
 
       const labelEl = document.createElement('div');
       labelEl.textContent = node.tag;
@@ -746,7 +885,7 @@ export class SceneCore {
         object,
         label,
         labelEl,
-        flow,
+        nodeFlow,
         rig,
       });
     }
@@ -778,6 +917,7 @@ export class SceneCore {
       if (!from || !to || !from.node.visible || !to.node.visible) continue;
       const bp = buildPipeMesh(edge, from.object, to.object);
       if (!bp) continue;
+      setPipeSelectedHighlight(bp, bp.id === this.selectedPipeId);
       this.pipesGroup.add(bp.group);
       this.builtPipes.set(edge.id, bp);
     }
@@ -1028,19 +1168,14 @@ export class SceneCore {
 
     for (const entry of this.entries.values()) {
       if (entry.rig) entry.rig.tick(dt);
+      if (entry.nodeFlow) tickNodePipeFlow(entry.nodeFlow, dt, this.telemetryMap);
       if (this.transform.dragging && this.transform.object === entry.object) {
         this.positionLabel(entry.label, entry.object);
       }
     }
 
     for (const bp of this.builtPipes.values()) {
-      bp.phase = (bp.phase + dt * 0.28) % 1;
-      const count = bp.pulses.length;
-      for (let i = 0; i < count; i++) {
-        const u = (bp.phase + i / count) % 1;
-        const pt = bp.curve.getPointAt(u);
-        bp.pulses[i].position.copy(pt);
-      }
+      tickBuiltPipeFlow(bp, dt, this.telemetryMap);
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -1061,6 +1196,7 @@ export class SceneCore {
     if (this.selectionBox) this.selectionBox.dispose();
     this.transform.dispose();
     this.orbit.dispose();
+    this.clearGroundBorder();
     this.gridMajor?.dispose();
     this.gridMinor?.dispose();
     this.groundMesh.geometry.dispose();
@@ -1070,7 +1206,7 @@ export class SceneCore {
     }
     this.builtPipes.clear();
     for (const entry of this.entries.values()) {
-      entry.flow?.dispose();
+      if (entry.nodeFlow) disposeNodePipeFlow(entry.nodeFlow);
       disposeAssetObject(entry.object);
     }
     this.entries.clear();

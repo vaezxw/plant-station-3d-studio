@@ -3,9 +3,12 @@ import { create } from 'zustand';
 import { getCatalogItem, type CatalogKind } from '../domain/catalog';
 import { PROJECT_PRESETS } from '../domain/presets';
 import {
+  createDefaultGroundConfig,
+  createDefaultPipeFlow,
   createWidgetsForTemplate,
   type DashboardTemplateId,
   type DashboardWidgetConfig,
+  type GroundConfig,
   type PipeEdge,
   type ProjectSchema,
   type SceneNode,
@@ -40,6 +43,7 @@ type ProjectState = {
   loadPreset: (presetId: string) => void;
   importProject: (schema: ProjectSchema) => void;
   updateProjectMeta: (patch: Partial<Pick<ProjectSchema, 'name' | 'description' | 'themeId' | 'dashboardTemplate'>>) => void;
+  updateGroundConfig: (patch: Partial<GroundConfig>, recordHistory?: boolean) => void;
 
   addNodeFromCatalog: (kind: CatalogKind, position: Vec3) => SceneNode;
   addCustomGlbNode: (customGlbId: string, name: string, position: Vec3) => SceneNode;
@@ -47,6 +51,7 @@ type ProjectState = {
   duplicateNode: (id: string) => SceneNode | null;
   removeNode: (id: string) => void;
   addPipe: (pipe: Omit<PipeEdge, 'id'>) => PipeEdge;
+  updatePipe: (id: string, patch: Partial<PipeEdge>, recordHistory?: boolean) => void;
   removePipe: (id: string) => void;
   setDashboardTemplate: (tpl: DashboardTemplateId) => void;
   setDashboardWidgets: (widgets: DashboardWidgetConfig[]) => void;
@@ -175,6 +180,23 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
     setState({ project: next });
   },
 
+  updateGroundConfig: (patch, recordHistory = true) => {
+    const cur = getState().project;
+    const baseGround = cur.ground ?? createDefaultGroundConfig();
+    const next: ProjectSchema = {
+      ...cur,
+      ground: { ...baseGround, ...patch },
+      updatedAt: Date.now(),
+    };
+    persistActive(next);
+    if (recordHistory) {
+      const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+      setState({ project: next, past, future: [] });
+    } else {
+      setState({ project: next });
+    }
+  },
+
   addNodeFromCatalog: (kind, position) => {
     const cur = getState().project;
     const item = getCatalogItem(kind);
@@ -188,6 +210,11 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
       position,
       rotation: [0, 0, 0],
       scale: [1, 1, 1],
+      floorStyle: kind === 'FLOOR_SLAB' || kind === 'BASE_PAD' ? 'weathered-concrete' : undefined,
+      pipeFlow:
+        kind === 'PIPE' || kind === 'PIPE_ELBOW' || kind === 'SIGHT_GLASS'
+          ? createDefaultPipeFlow()
+          : undefined,
       visible: true,
       locked: false,
       pointIds: [],
@@ -279,6 +306,7 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
     const cur = getState().project;
     const created: PipeEdge = {
       ...pipe,
+      flow: pipe.flow ?? createDefaultPipeFlow(),
       id: `pipe-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
@@ -286,6 +314,20 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
     persistActive(next);
     setState({ project: next, past, future: [] });
     return created;
+  },
+
+  updatePipe: (id, patch, recordHistory = true) => {
+    const cur = getState().project;
+    if (!cur.pipes.some((p) => p.id === id)) return;
+    const pipes = cur.pipes.map((p) => (p.id === id ? { ...p, ...patch } : p));
+    const next = { ...cur, pipes, updatedAt: Date.now() };
+    persistActive(next);
+    if (recordHistory) {
+      const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+      setState({ project: next, past, future: [] });
+    } else {
+      setState({ project: next });
+    }
   },
 
   removePipe: (id) => {

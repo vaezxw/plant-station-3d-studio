@@ -19,39 +19,126 @@ if (typeof globalThis.FileReader === 'undefined') {
 const OUT_DIR = join(process.cwd(), 'public', 'assets', 'studio');
 mkdirSync(OUT_DIR, { recursive: true });
 
+// 严格对标参考图与视频的克制重工业 SCADA 材质体系
 const M = {
   stainless: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:stainless', color: 0xbcc7d4, metalness: 0.86, roughness: 0.26 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:stainless',
+      color: 0xd4dde6,
+      metalness: 0.88,
+      roughness: 0.24,
+    }),
+  weldSeam: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:weldSeam',
+      color: 0x8b96a3,
+      metalness: 0.74,
+      roughness: 0.56,
+    }),
+  castIron: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:castIron',
+      color: 0x262d38,
+      metalness: 0.76,
+      roughness: 0.44,
+    }),
   darkSteel: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:darkSteel', color: 0x1e293b, metalness: 0.68, roughness: 0.44 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:darkSteel',
+      color: 0x1b212b,
+      metalness: 0.74,
+      roughness: 0.48,
+    }),
   steelSlate: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:steelSlate', color: 0x334155, metalness: 0.6, roughness: 0.42 }),
-  diamondPlate: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:diamondPlate', color: 0x475569, metalness: 0.72, roughness: 0.45 }),
-  hazardStripe: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:hazardStripe', color: 0xfacc15, metalness: 0.2, roughness: 0.55 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:steelSlate',
+      color: 0x354152,
+      metalness: 0.62,
+      roughness: 0.42,
+    }),
   castAluminum: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:castAluminum', color: 0xd0d9e4, metalness: 0.55, roughness: 0.44 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:castAluminum',
+      color: 0xbac4cf,
+      metalness: 0.66,
+      roughness: 0.36,
+    }),
+  industrialBlue: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:industrialBlue',
+      color: 0x1555b0,
+      metalness: 0.38,
+      roughness: 0.28,
+    }),
+  perforatedMetal: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:perforatedMetal',
+      color: 0xd0d8e0,
+      metalness: 0.85,
+      roughness: 0.3,
+    }),
+  hxPlates: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:hxPlates',
+      color: 0xaab6c4,
+      metalness: 0.82,
+      roughness: 0.34,
+    }),
+  concretePlinth: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:concretePlinth',
+      color: 0x8b95a2,
+      metalness: 0.06,
+      roughness: 0.84,
+    }),
+  floorSlab: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:floorSlab',
+      color: 0x2a333f,
+      metalness: 0.12,
+      roughness: 0.52,
+    }),
+  diamondPlate: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:diamondPlate',
+      color: 0x3b4656,
+      metalness: 0.76,
+      roughness: 0.38,
+    }),
+  hazardStripe: () =>
+    new THREE.MeshStandardMaterial({
+      name: 'mat:hazardStripe',
+      color: 0xb4821a,
+      metalness: 0.22,
+      roughness: 0.55,
+    }),
   brass: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:brass', color: 0xc8964e, metalness: 0.85, roughness: 0.26 }),
-  paintBlue: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:paintBlue', color: 0x0284c7, metalness: 0.38, roughness: 0.36 }),
-  paintCyan: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:paintCyan', color: 0x0891b2, metalness: 0.38, roughness: 0.36 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:brass',
+      color: 0xb58947,
+      metalness: 0.84,
+      roughness: 0.28,
+    }),
   paintAmber: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:paintAmber', color: 0xd97706, metalness: 0.35, roughness: 0.4 }),
-  paintYellow: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:paintYellow', color: 0xeab308, metalness: 0.32, roughness: 0.42 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:paintAmber',
+      color: 0xb45309,
+      metalness: 0.36,
+      roughness: 0.4,
+    }),
   paintRed: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:paintRed', color: 0xb91c1c, metalness: 0.35, roughness: 0.4 }),
-  paintGreen: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:paintGreen', color: 0x059669, metalness: 0.3, roughness: 0.44 }),
+    new THREE.MeshStandardMaterial({
+      name: 'mat:paintRed',
+      color: 0x991b1b,
+      metalness: 0.38,
+      roughness: 0.38,
+    }),
   glass: () =>
     new THREE.MeshPhysicalMaterial({
       name: 'mat:glass',
-      color: 0xcffafe,
+      color: 0xdbeafe,
       transparent: true,
-      opacity: 0.34,
+      opacity: 0.32,
       roughness: 0.06,
       metalness: 0.08,
     }),
@@ -64,7 +151,7 @@ const M = {
       roughness: 0.2,
     }),
   meterCounter: () =>
-    new THREE.MeshStandardMaterial({ name: 'mat:meterCounter', color: 0xe2e8f0, roughness: 0.35, metalness: 0.1 }),
+    new THREE.MeshStandardMaterial({ name: 'mat:meterCounter', color: 0xdbe2ea, roughness: 0.35, metalness: 0.1 }),
   nameplate: () =>
     new THREE.MeshStandardMaterial({ name: 'mat:nameplate', color: 0xcbd5e1, roughness: 0.35, metalness: 0.7 }),
   dial: () =>
@@ -74,7 +161,7 @@ const M = {
       name: 'mat:lampGreen',
       color: 0x22c55e,
       emissive: 0x16a34a,
-      emissiveIntensity: 0.75,
+      emissiveIntensity: 0.8,
       roughness: 0.2,
     }),
   lampAmber: () =>
@@ -82,7 +169,7 @@ const M = {
       name: 'mat:lampAmber',
       color: 0xf59e0b,
       emissive: 0xd97706,
-      emissiveIntensity: 0.75,
+      emissiveIntensity: 0.8,
       roughness: 0.2,
     }),
   lampRed: () =>
@@ -104,18 +191,75 @@ function addPort(parent, id, x, y, z, nx, ny, nz) {
   parent.add(anchor);
 }
 
-function makeFlangeAssembly(radius = 0.16, pipeR = 0.09, bolts = 8, mat = M.stainless()) {
+function makeBeveledBox(w, h, d, bevel = 0.016, material = M.castIron()) {
+  const hw = Math.max(0.01, w / 2 - bevel);
+  const hh = Math.max(0.01, h / 2 - bevel);
+  const shape = new THREE.Shape();
+  shape.moveTo(-hw, -hh);
+  shape.lineTo(hw, -hh);
+  shape.lineTo(hw, hh);
+  shape.lineTo(-hw, hh);
+  shape.closePath();
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: Math.max(0.016, d - bevel * 2),
+    bevelEnabled: true,
+    bevelThickness: bevel,
+    bevelSize: bevel,
+    bevelSegments: 2,
+  });
+  geo.center();
+  return new THREE.Mesh(geo, material);
+}
+
+/** 带倒角顶层与不锈钢地脚锚板的混凝土水泥设备基座（复刻参考图所有设备下方水泥台） */
+function makeConcretePlinth(w, h, d, anchorCoords = null) {
   const g = new THREE.Group();
-  const disc = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.036, 24), mat);
+  const lowerH = h * 0.72;
+  const upperH = h * 0.28;
+  const lower = makeBeveledBox(w, lowerH, d, 0.012, M.concretePlinth());
+  lower.position.y = lowerH * 0.5;
+  const upper = makeBeveledBox(w - 0.05, upperH, d - 0.05, 0.01, M.concretePlinth());
+  upper.position.y = lowerH + upperH * 0.5;
+  g.add(lower, upper);
+
+  // 地坪接缝压边钢条
+  const curbMat = M.darkSteel();
+  const curb = makeBeveledBox(w + 0.03, 0.018, d + 0.03, 0.004, curbMat);
+  curb.position.y = 0.009;
+  g.add(curb);
+
+  if (anchorCoords) {
+    const plateMat = M.stainless();
+    const boltMat = M.darkSteel();
+    const boltGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.028, 6);
+    for (const [ax, az] of anchorCoords) {
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.014, 0.14), plateMat);
+      plate.position.set(ax, h + 0.007, az);
+      g.add(plate);
+      for (const bx of [-0.045, 0.045]) {
+        for (const bz of [-0.045, 0.045]) {
+          const bolt = new THREE.Mesh(boltGeo, boltMat);
+          bolt.position.set(ax + bx, h + 0.018, az + bz);
+          g.add(bolt);
+        }
+      }
+    }
+  }
+  return g;
+}
+
+function makeFlangeAssembly(radius = 0.15, pipeR = 0.085, bolts = 8, mat = M.stainless()) {
+  const g = new THREE.Group();
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.034, 24), mat);
   disc.rotation.z = Math.PI / 2;
   g.add(disc);
   const raisedFace = new THREE.Mesh(
-    new THREE.CylinderGeometry(pipeR * 1.28, pipeR * 1.28, 0.044, 24),
+    new THREE.CylinderGeometry(pipeR * 1.26, pipeR * 1.26, 0.042, 24),
     M.stainless(),
   );
   raisedFace.rotation.z = Math.PI / 2;
   g.add(raisedFace);
-  const boltGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.058, 6);
+  const boltGeo = new THREE.CylinderGeometry(0.011, 0.011, 0.056, 6);
   const boltMat = M.darkSteel();
   const rBolt = (radius + pipeR * 1.2) * 0.52;
   for (let i = 0; i < bolts; i++) {
@@ -128,35 +272,37 @@ function makeFlangeAssembly(radius = 0.16, pipeR = 0.09, bolts = 8, mat = M.stai
   return g;
 }
 
-function makeHandwheel(radius = 0.14, mat = M.paintRed()) {
+function makeHandwheel(radius = 0.14, mat = M.stainless()) {
   const g = new THREE.Group();
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.018, 10, 24), mat);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.014, 10, 28), mat);
   rim.rotation.x = Math.PI / 2;
   g.add(rim);
-  for (let i = 0; i < 3; i++) {
-    const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, radius * 2, 8), mat);
+  for (let i = 0; i < 5; i++) {
+    const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, radius, 8), mat);
+    const a = (i / 5) * Math.PI * 2;
     spoke.rotation.z = Math.PI / 2;
-    spoke.rotation.y = (i * Math.PI) / 3;
+    spoke.rotation.y = a;
+    spoke.position.set(Math.cos(a) * (radius * 0.5), 0, -Math.sin(a) * (radius * 0.5));
     g.add(spoke);
   }
-  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.032, 0.04, 12), M.stainless());
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.03, 0.044, 12), M.castIron());
   g.add(hub);
   return g;
 }
 
-function makeDialGauge(radius = 0.075) {
+function makeDialGauge(radius = 0.07) {
   const g = new THREE.Group();
-  const casing = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.042, 24), M.stainless());
+  const casing = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.04, 24), M.stainless());
   casing.rotation.x = Math.PI / 2;
   g.add(casing);
-  const face = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.86, radius * 0.86, 0.045, 24), M.dial());
+  const face = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.86, radius * 0.86, 0.043, 24), M.dial());
   face.rotation.x = Math.PI / 2;
   face.name = 'dial-face';
   g.add(face);
-  const glass = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.88, radius * 0.88, 0.049, 24), M.glass());
+  const glass = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.88, radius * 0.88, 0.046, 24), M.glass());
   glass.rotation.x = Math.PI / 2;
   g.add(glass);
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.07, 10), M.brass());
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.065, 10), M.stainless());
   stem.position.y = -radius - 0.025;
   g.add(stem);
   return g;
@@ -164,982 +310,1447 @@ function makeDialGauge(radius = 0.075) {
 
 function makeEllipticalHead(radius, height) {
   const pts = [];
-  for (let i = 0; i <= 12; i++) {
-    const t = (i / 12) * (Math.PI / 2);
+  for (let i = 0; i <= 14; i++) {
+    const t = (i / 14) * (Math.PI / 2);
     pts.push(new THREE.Vector2(Math.cos(t) * radius, Math.sin(t) * height));
   }
-  return new THREE.LatheGeometry(pts, 28);
+  return new THREE.LatheGeometry(pts, 32);
 }
 
-function makeBeveledBox(w, h, d, bevel = 0.018, material = M.darkSteel()) {
-  const hw = w / 2 - bevel;
-  const hh = h / 2 - bevel;
-  const shape = new THREE.Shape();
-  shape.moveTo(-hw, -hh);
-  shape.lineTo(hw, -hh);
-  shape.lineTo(hw, hh);
-  shape.lineTo(-hw, hh);
-  shape.closePath();
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: Math.max(0.02, d - bevel * 2),
-    bevelEnabled: true,
-    bevelThickness: bevel,
-    bevelSize: bevel,
-    bevelSegments: 2,
-  });
-  geo.center();
-  return new THREE.Mesh(geo, material);
-}
-
-function makePipeSpan(p1, p2, radius = 0.06, mat = M.paintYellow()) {
+function makePipeSpan(p1, p2, radius = 0.055, mat = M.stainless()) {
   const v1 = new THREE.Vector3(...p1);
   const v2 = new THREE.Vector3(...p2);
   const dir = new THREE.Vector3().subVectors(v2, v1);
   const len = dir.length();
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, 18), mat);
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, 20), mat);
   mesh.position.addVectors(v1, v2).multiplyScalar(0.5);
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
   return mesh;
 }
 
-// 1. 工业级双路燃气调压计量撬（替换旧简化框）
-function buildHengGuangSkid() {
+/** 带 U 型钢卡箍与底座钢板的地面立柱管道支架 */
+function makePipeStanchion(x, yTop, z, radius = 0.055) {
   const g = new THREE.Group();
-
-  // 槽钢公共底撬 + 防滑花纹钢板 + 黄黑警示边条 + 吊耳
-  const frame = makeBeveledBox(3.4, 0.14, 1.85, 0.015, M.darkSteel());
-  frame.position.y = 0.07;
-  g.add(frame);
-
-  const deck = new THREE.Mesh(new THREE.BoxGeometry(3.26, 0.03, 1.72), M.diamondPlate());
-  deck.position.y = 0.145;
-  g.add(deck);
-
-  for (const sz of [-0.93, 0.93]) {
-    const stripe = new THREE.Mesh(new THREE.BoxGeometry(3.42, 0.06, 0.02), M.hazardStripe());
-    stripe.position.set(0, 0.07, sz);
-    g.add(stripe);
-  }
-  for (const sx of [-1.62, 1.62]) {
-    for (const sz of [-0.86, 0.86]) {
-      const lug = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.014, 8, 16), M.paintYellow());
-      lug.position.set(sx, 0.17, sz);
-      g.add(lug);
-    }
-  }
-
-  // 后侧及两侧安全防护栏杆
-  const railMat = M.paintYellow();
-  for (const sx of [-1.6, -0.55, 0.55, 1.6]) {
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.92, 10), railMat);
-    post.position.set(sx, 0.6, -0.86);
-    g.add(post);
-  }
-  for (const sy of [0.62, 1.04]) {
-    const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 3.24, 10), railMat);
-    bar.rotation.z = Math.PI / 2;
-    bar.position.set(0, sy, -0.86);
-    g.add(bar);
-  }
-
-  // 进出端 DN150 汇总集气总管（左进 -1.7，右出 +1.7）
-  for (const [dir, sx, portId] of [[-1, -1.48, 'in'], [1, 1.48, 'out']]) {
-    const header = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 1.18, 22), M.paintAmber());
-    header.rotation.x = Math.PI / 2;
-    header.position.set(sx, 0.64, 0);
-    g.add(header);
-
-    const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.28, 20), M.paintAmber());
-    branch.rotation.z = Math.PI / 2;
-    branch.position.set(sx + dir * 0.14, 0.64, 0);
-    g.add(branch);
-
-    const flange = makeFlangeAssembly(0.175, 0.095, 8);
-    flange.position.set(sx + dir * 0.28, 0.64, 0);
-    g.add(flange);
-    addPort(g, portId, sx + dir * 0.3, 0.64, 0, dir, 0, 0);
-
-    // 总管两端支撑立柱
-    for (const sz of [-0.46, 0.46]) {
-      const sup = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.04, 0.48, 12), M.steelSlate());
-      sup.position.set(sx, 0.38, sz);
-      g.add(sup);
-    }
-  }
-
-  // A / B 双路并联过滤调压计量支路
-  for (const [idx, sz] of [-0.42, 0.42].entries()) {
-    // 支路管道底通
-    g.add(makePipeSpan([-1.48, 0.64, sz], [1.48, 0.64, sz], 0.068, idx === 0 ? M.paintYellow() : M.paintAmber()));
-
-    // 进口球阀
-    const vIn = buildValveHOV();
-    vIn.scale.setScalar(0.75);
-    vIn.position.set(-1.12, 0.64, sz);
-    g.add(vIn);
-
-    // 旋风过滤分离筒
-    const filter = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.56, 20), M.stainless());
-    filter.position.set(-0.66, 0.66, sz);
-    g.add(filter);
-    const fCap = new THREE.Mesh(makeEllipticalHead(0.14, 0.08), M.stainless());
-    fCap.position.set(-0.66, 0.94, sz);
-    g.add(fCap);
-    const fDrain = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.22, 10), M.brass());
-    fDrain.position.set(-0.66, 0.28, sz);
-    g.add(fDrain);
-
-    // 安全切断阀 SSV + 调压阀 PCV
-    const ssv = buildValveSSV();
-    ssv.scale.setScalar(0.68);
-    ssv.position.set(-0.18, 0.64, sz);
-    g.add(ssv);
-
-    const pcv = buildValvePCV();
-    pcv.scale.setScalar(0.68);
-    pcv.position.set(0.32, 0.64, sz);
-    g.add(pcv);
-
-    // 超声波计量直管段 + 积算表头
-    const meterBody = new THREE.Mesh(new THREE.CylinderGeometry(0.082, 0.082, 0.45, 20), M.paintBlue());
-    meterBody.rotation.z = Math.PI / 2;
-    meterBody.position.set(0.84, 0.64, sz);
-    g.add(meterBody);
-    const meterHead = makeBeveledBox(0.18, 0.14, 0.12, 0.01, M.darkSteel());
-    meterHead.position.set(0.84, 0.82, sz);
-    g.add(meterHead);
-    const scr = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.01), M.screen());
-    scr.position.set(0.84, 0.82, sz + 0.062);
-    g.add(scr);
-
-    // 压力表
-    const gauge = makeDialGauge(0.06);
-    gauge.position.set(0.55, 0.88, sz);
-    g.add(gauge);
-
-    // 出口球阀
-    const vOut = buildValveHOV();
-    vOut.scale.setScalar(0.75);
-    vOut.position.set(1.22, 0.64, sz);
-    g.add(vOut);
-  }
-
-  // 安全放散立管 + 防雨帽 + 就地防爆接线箱 + 铭牌
-  const ventPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.38, 14), M.paintRed());
-  ventPipe.position.set(0.15, 1.32, -0.68);
-  g.add(ventPipe);
-  const rainCap = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.08, 16), M.stainless());
-  rainCap.position.set(0.15, 2.04, -0.68);
-  g.add(rainCap);
-
-  const jbox = makeBeveledBox(0.36, 0.44, 0.2, 0.015, M.castAluminum());
-  jbox.position.set(-0.95, 0.82, 0.78);
-  g.add(jbox);
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.015), M.nameplate());
-  plate.position.set(0, 0.1, 0.93);
-  g.add(plate);
-
+  const foot = makeBeveledBox(0.16, 0.024, 0.16, 0.005, M.darkSteel());
+  foot.position.set(x, 0.012, z);
+  g.add(foot);
+  const postH = Math.max(0.08, yTop - radius);
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, postH, 12), M.castIron());
+  post.position.set(x, postH * 0.5 + 0.01, z);
+  g.add(post);
+  const saddle = new THREE.Mesh(new THREE.TorusGeometry(radius * 1.15, 0.01, 8, 18, Math.PI), M.stainless());
+  saddle.rotation.z = Math.PI;
+  saddle.rotation.y = Math.PI / 2;
+  saddle.position.set(x, yTop, z);
+  g.add(saddle);
   return g;
 }
 
-// 2. 高细节立式缓冲储罐
-function buildTank() {
+/** YE3 重工业异步驱动电机（密集散热筋 + 防爆接线盒 + 冲压百叶风扇罩） */
+function makeIndustrialMotor({ radius = 0.19, length = 0.5, bodyMat = M.industrialBlue(), ribCount = 18 } = {}) {
   const g = new THREE.Group();
-  const radius = 0.48;
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 24), bodyMat);
+  shell.rotation.z = Math.PI / 2;
+  g.add(shell);
 
-  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 1.15, 32), M.castAluminum());
-  cyl.position.y = 0.96;
-  g.add(cyl);
-
-  const topHead = new THREE.Mesh(makeEllipticalHead(radius, 0.24), M.castAluminum());
-  topHead.position.y = 1.535;
-  g.add(topHead);
-
-  const botHead = new THREE.Mesh(makeEllipticalHead(radius, 0.22), M.castAluminum());
-  botHead.rotation.x = Math.PI;
-  botHead.position.y = 0.385;
-  g.add(botHead);
-
-  // 三根槽钢裙座支腿 + 地脚固定板
-  for (let i = 0; i < 3; i++) {
-    const a = (i / 3) * Math.PI * 2 + 0.3;
-    const x = Math.cos(a) * 0.4;
-    const z = Math.sin(a) * 0.4;
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.62, 0.09), M.darkSteel());
-    leg.position.set(x, 0.31, z);
-    g.add(leg);
-    const pad = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.03, 0.16), M.steelSlate());
-    pad.position.set(x, 0.015, z);
-    g.add(pad);
-  }
-
-  // 带 10 颗螺栓的人孔盲板法兰
-  const manNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.12, 20), M.steelSlate());
-  manNeck.rotation.x = Math.PI / 2;
-  manNeck.position.set(0, 0.68, 0.48);
-  g.add(manNeck);
-  const manCover = makeFlangeAssembly(0.22, 0.15, 10, M.steelSlate());
-  manCover.rotation.y = -Math.PI / 2;
-  manCover.position.set(0, 0.68, 0.54);
-  g.add(manCover);
-
-  // 磁翻板液位计（红白液柱指示）
-  const lvlTube = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.85, 12), M.stainless());
-  lvlTube.position.set(0.32, 0.98, 0.38);
-  g.add(lvlTube);
-  const lvlRed = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.42, 0.02), M.paintRed());
-  lvlRed.position.set(0.32, 0.78, 0.415);
-  g.add(lvlRed);
-  const lvlWhite = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.36, 0.02), M.dial());
-  lvlWhite.position.set(0.32, 1.18, 0.415);
-  g.add(lvlWhite);
-
-  // 顶部安全阀与压力表 + 铭牌
-  const safety = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.24, 14), M.paintRed());
-  safety.position.set(0, 1.88, 0);
-  g.add(safety);
-  const gauge = makeDialGauge(0.07);
-  gauge.position.set(0.18, 1.82, 0.18);
-  g.add(gauge);
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.14, 0.015), M.nameplate());
-  plate.position.set(0, 1.15, 0.485);
-  g.add(plate);
-
-  // 左右进出口法兰接管
-  for (const [dir, id, y] of [[-1, 'in', 1.18], [1, 'out', 0.68]]) {
-    const stub = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.22, 18), M.stainless());
-    stub.rotation.z = Math.PI / 2;
-    stub.position.set(dir * 0.55, y, 0);
-    g.add(stub);
-    const fl = makeFlangeAssembly(0.16, 0.085, 8);
-    fl.position.set(dir * 0.66, y, 0);
-    g.add(fl);
-    addPort(g, id, dir * 0.68, y, 0, dir, 0, 0);
-  }
-
-  return g;
-}
-
-// 3. 高细节旋风除尘分离过滤器
-function buildFilterSeparator() {
-  const g = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.92, 26), M.paintBlue());
-  body.position.y = 0.84;
-  g.add(body);
-  const topHead = new THREE.Mesh(makeEllipticalHead(0.26, 0.12), M.paintBlue());
-  topHead.position.y = 1.3;
-  g.add(topHead);
-  const botCone = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.24, 26), M.paintBlue());
-  botCone.rotation.x = Math.PI;
-  botCone.position.y = 0.26;
-  g.add(botCone);
-
-  for (let i = 0; i < 3; i++) {
-    const a = (i / 3) * Math.PI * 2;
-    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.036, 0.54, 12), M.darkSteel());
-    leg.position.set(Math.cos(a) * 0.22, 0.27, Math.sin(a) * 0.22);
-    g.add(leg);
-  }
-
-  // 快开盲板顶盖 + 锁紧手轮
-  const blind = makeFlangeAssembly(0.24, 0.16, 10, M.stainless());
-  blind.rotation.z = Math.PI / 2;
-  blind.position.y = 1.44;
-  g.add(blind);
-  const wheel = makeHandwheel(0.11, M.paintRed());
-  wheel.position.set(0, 1.5, 0);
-  g.add(wheel);
-
-  const gauge = makeDialGauge(0.065);
-  gauge.position.set(0, 1.18, 0.29);
-  g.add(gauge);
-
-  for (const [dir, id, y] of [[-1, 'in', 0.95], [1, 'out', 0.65]]) {
-    const stub = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.2, 16), M.stainless());
-    stub.rotation.z = Math.PI / 2;
-    stub.position.set(dir * 0.34, y, 0);
-    g.add(stub);
-    const fl = makeFlangeAssembly(0.15, 0.08, 8);
-    fl.position.set(dir * 0.44, y, 0);
-    g.add(fl);
-    addPort(g, id, dir * 0.46, y, 0, dir, 0, 0);
-  }
-  return g;
-}
-
-// 4. 膜式燃气表（增加压铸合模法兰边、周圈螺钉、字轮窗口、铅封、通信天线盒）
-function buildMembraneMeter() {
-  const g = new THREE.Group();
-  const topHalf = makeBeveledBox(0.46, 0.24, 0.3, 0.022, M.castAluminum());
-  topHalf.position.y = 0.44;
-  g.add(topHalf);
-  const botHalf = makeBeveledBox(0.45, 0.32, 0.29, 0.022, M.castAluminum());
-  botHalf.position.y = 0.17;
-  g.add(botHalf);
-
-  // 合模腰线法兰与 12 颗铆钉
-  const waist = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.036, 0.34), M.stainless());
-  waist.position.y = 0.32;
-  g.add(waist);
-  for (const sx of [-0.21, -0.07, 0.07, 0.21]) {
-    for (const sz of [-0.155, 0.155]) {
-      const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.048, 6), M.darkSteel());
-      screw.position.set(sx, 0.32, sz);
-      g.add(screw);
-    }
-  }
-
-  // 侧面 NB-IoT / IC 通信模块盒
-  const commBox = makeBeveledBox(0.06, 0.22, 0.18, 0.01, M.paintBlue());
-  commBox.position.set(0.25, 0.36, 0);
-  g.add(commBox);
-  const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.14, 10), M.darkSteel());
-  antenna.position.set(0.26, 0.52, -0.04);
-  g.add(antenna);
-
-  // 顶部双管接头 + 波纹密封垫 + 六角锁母
-  for (const [idx, sx] of [-0.14, 0.14].entries()) {
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.16, 16), M.brass());
-    neck.position.set(sx, 0.64, 0);
-    g.add(neck);
-    const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.066, 0.066, 0.048, 6), M.stainless());
-    nut.position.set(sx, 0.68, 0);
-    g.add(nut);
-    addPort(g, idx === 0 ? 'in' : 'out', sx, 0.72, 0, 0, 1, 0);
-  }
-
-  // 专属机械字轮+液晶双显读数窗口
-  const bezel = makeBeveledBox(0.32, 0.19, 0.05, 0.01, M.darkSteel());
-  bezel.position.set(0, 0.42, 0.155);
-  g.add(bezel);
-  const counterFace = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.13, 0.012), M.meterCounter());
-  counterFace.position.set(0, 0.42, 0.182);
-  g.add(counterFace);
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(0.27, 0.14, 0.01), M.glass());
-  glass.position.set(0, 0.42, 0.19);
-  g.add(glass);
-
-  // 防拆红色铅封卡扣
-  const seal = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.025, 10), M.paintRed());
-  seal.rotation.x = Math.PI / 2;
-  seal.position.set(0.18, 0.25, 0.15);
-  g.add(seal);
-
-  return g;
-}
-
-// 5. 罗茨腰轮燃气表（八字双腔 + 油位窗 + 散热肋片 + 温压修正仪）
-function buildRootsMeter() {
-  const g = new THREE.Group();
-  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.105, 0.82, 24), M.steelSlate());
-  pipe.rotation.z = Math.PI / 2;
-  pipe.position.y = 0.25;
-  g.add(pipe);
-
-  const f1 = makeFlangeAssembly(0.185, 0.105, 8);
-  f1.position.set(-0.41, 0.25, 0);
-  const f2 = makeFlangeAssembly(0.185, 0.105, 8);
-  f2.position.set(0.41, 0.25, 0);
-  g.add(f1, f2);
-  addPort(g, 'in', -0.43, 0.25, 0, -1, 0, 0);
-  addPort(g, 'out', 0.43, 0.25, 0, 1, 0, 0);
-
-  for (const sz of [-0.08, 0.08]) {
-    const lobe = new THREE.Mesh(new THREE.CylinderGeometry(0.148, 0.148, 0.4, 24), M.darkSteel());
-    lobe.rotation.x = Math.PI / 2;
-    lobe.position.set(0, 0.25, sz);
-    g.add(lobe);
-  }
-  const frontCover = makeBeveledBox(0.34, 0.28, 0.06, 0.015, M.castAluminum());
-  frontCover.position.set(0, 0.25, 0.21);
-  g.add(frontCover);
-
-  // 油位观察窗 + 注油嘴
-  const oilRing = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.025, 16), M.brass());
-  oilRing.rotation.x = Math.PI / 2;
-  oilRing.position.set(-0.08, 0.22, 0.242);
-  g.add(oilRing);
-  const oilRed = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.03, 12), M.lampRed());
-  oilRed.rotation.x = Math.PI / 2;
-  oilRed.position.set(-0.08, 0.22, 0.245);
-  g.add(oilRed);
-
-  // 散热颈 + 倾斜防爆温压修正积算仪
-  for (let i = 0; i < 3; i++) {
-    const fin = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.015, 14), M.stainless());
-    fin.position.set(0, 0.39 + i * 0.038, 0);
+  // 密集散热翅片（围绕外壳径向分布，复刻 P-201/P-202/P-203 电机特征）
+  const finLen = length * 0.72;
+  const finGeo = new THREE.BoxGeometry(finLen, 0.012, radius * 2.12);
+  for (let i = 0; i < ribCount; i++) {
+    const a = (i / ribCount) * Math.PI * 2;
+    const fin = new THREE.Mesh(finGeo, bodyMat);
+    fin.rotation.x = a;
+    fin.position.x = -0.02;
     g.add(fin);
   }
-  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.048, 0.18, 14), M.stainless());
-  neck.position.set(0, 0.45, 0);
-  g.add(neck);
-  const head = makeBeveledBox(0.28, 0.21, 0.17, 0.015, M.paintBlue());
-  head.position.set(0, 0.6, 0);
-  head.rotation.x = -0.25;
-  g.add(head);
-  const lcd = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.015), M.screen());
-  lcd.position.set(0, 0.61, 0.082);
-  lcd.rotation.x = -0.25;
-  g.add(lcd);
-  return g;
-}
 
-// 6. 超声波燃气表
-function buildUltrasonicMeter() {
-  const g = new THREE.Group();
-  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.94, 24), M.paintBlue());
-  pipe.rotation.z = Math.PI / 2;
-  pipe.position.y = 0.25;
-  g.add(pipe);
+  // 后端风扇罩
+  const fanCowl = new THREE.Mesh(new THREE.CylinderGeometry(radius * 1.04, radius * 0.96, length * 0.34, 24), M.castIron());
+  fanCowl.rotation.z = Math.PI / 2;
+  fanCowl.position.x = length * 0.5 + length * 0.14;
+  g.add(fanCowl);
+  const endCap = new THREE.Mesh(new THREE.SphereGeometry(radius * 0.95, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), M.castIron());
+  endCap.rotation.z = -Math.PI / 2;
+  endCap.position.x = length * 0.67;
+  g.add(endCap);
 
-  const f1 = makeFlangeAssembly(0.185, 0.11, 8);
-  f1.position.set(-0.47, 0.25, 0);
-  const f2 = makeFlangeAssembly(0.185, 0.11, 8);
-  f2.position.set(0.47, 0.25, 0);
-  g.add(f1, f2);
-  addPort(g, 'in', -0.49, 0.25, 0, -1, 0, 0);
-  addPort(g, 'out', 0.49, 0.25, 0, 1, 0, 0);
+  // 顶置防爆接线盒 + 电缆格兰头
+  const tBox = makeBeveledBox(0.14, 0.11, 0.14, 0.01, bodyMat);
+  tBox.position.set(-0.04, radius + 0.055, 0);
+  g.add(tBox);
+  const gland = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.06, 10), M.stainless());
+  g.add(gland);
+  gland.rotation.x = Math.PI / 2;
+  gland.position.set(-0.04, radius + 0.055, 0.09);
 
-  for (const sx of [-0.19, 0.19]) {
-    for (const sz of [-0.11, 0.11]) {
-      const boss = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.038, 0.15, 14), M.brass());
-      boss.rotation.x = sz > 0 ? 0.85 : -0.85;
-      boss.position.set(sx, 0.28, sz * 1.15);
-      g.add(boss);
-    }
-  }
-  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.16, 14), M.stainless());
-  neck.position.set(0, 0.41, 0);
-  g.add(neck);
-  const head = makeBeveledBox(0.3, 0.23, 0.17, 0.015, M.darkSteel());
-  head.position.set(0, 0.57, 0);
-  g.add(head);
-  const lcd = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.13, 0.012), M.screen());
-  lcd.position.set(0, 0.57, 0.087);
-  g.add(lcd);
-  const gauge = makeDialGauge(0.055);
-  gauge.position.set(0.3, 0.42, 0);
-  g.add(gauge);
-  return g;
-}
-
-// 7. 音速喷嘴标定台（带3只待检表样品 + 气动夹紧器 + 6路喷嘴 + 触摸屏）
-function buildCalibrationRig() {
-  const g = new THREE.Group();
-  const desk = makeBeveledBox(2.35, 0.86, 1.16, 0.02, M.darkSteel());
-  desk.position.y = 0.43;
-  g.add(desk);
-  const benchTop = makeBeveledBox(2.42, 0.06, 1.24, 0.015, M.diamondPlate());
-  benchTop.position.y = 0.89;
-  g.add(benchTop);
-
-  // 上置卧式椭圆封头真空稳压罐
-  const tankCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 1.38, 28), M.paintBlue());
-  tankCyl.rotation.z = Math.PI / 2;
-  tankCyl.position.set(-0.22, 1.48, -0.28);
-  g.add(tankCyl);
-  for (const [dir, sx] of [[-1, -0.91], [1, 0.47]]) {
-    const head = new THREE.Mesh(makeEllipticalHead(0.24, 0.14), M.paintBlue());
-    head.rotation.z = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
-    head.position.set(sx, 1.48, -0.28);
-    g.add(head);
-  }
-  const tankGauge = makeDialGauge(0.065);
-  tankGauge.position.set(-0.22, 1.8, -0.28);
-  g.add(tankGauge);
-
-  // 6 路并联拉瓦尔音速喷嘴 + 先导电磁阀
-  for (let i = 0; i < 6; i++) {
-    const x = -0.84 + i * 0.25;
-    const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.46, 14), M.stainless());
-    pipe.position.set(x, 1.14, 0.04);
-    g.add(pipe);
-    const coil = new THREE.Mesh(new THREE.BoxGeometry(0.068, 0.08, 0.068), M.paintAmber());
-    coil.position.set(x, 1.1, 0.1);
-    g.add(coil);
-  }
-
-  // 3 表位气动夹具台 + 正在检定的燃气表样品
-  const clampBar = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.07, 0.14), M.steelSlate());
-  clampBar.position.set(-0.22, 0.96, 0.36);
-  g.add(clampBar);
-  for (let i = 0; i < 3; i++) {
-    const mx = -0.7 + i * 0.48;
-    const sampleMeter = makeBeveledBox(0.24, 0.28, 0.16, 0.012, M.castAluminum());
-    sampleMeter.position.set(mx, 1.12, 0.36);
-    g.add(sampleMeter);
-    const face = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.09, 0.01), M.meterCounter());
-    face.position.set(mx, 1.15, 0.442);
-    g.add(face);
-    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.18, 12), M.stainless());
-    cyl.position.set(mx, 1.38, 0.36);
-    g.add(cyl);
-  }
-
-  // 右侧触摸屏 + 三色警示柱
-  const hmi = makeBeveledBox(0.48, 0.36, 0.07, 0.015, M.darkSteel());
-  hmi.position.set(0.84, 1.24, 0.24);
-  hmi.rotation.x = -0.35;
-  g.add(hmi);
-  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.27, 0.012), M.screen());
-  scr.position.set(0.84, 1.25, 0.272);
-  scr.rotation.x = -0.35;
-  g.add(scr);
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.54, 10), M.stainless());
-  pole.position.set(1.02, 1.18, -0.36);
-  g.add(pole);
-  const led = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.1, 14), M.lampGreen());
-  led.position.set(1.02, 1.48, -0.36);
-  g.add(led);
-
-  addPort(g, 'in', -1.2, 0.45, -0.28, -1, 0, 0);
-  addPort(g, 'out', 1.2, 0.45, -0.28, 1, 0, 0);
-  return g;
-}
-
-// 8. 滚筒装配线（含托盘、精细表体、光电龙门传感器与调速控制箱）
-function buildConveyorLine() {
-  const g = new THREE.Group();
-  for (const sz of [-0.36, 0.36]) {
-    const beam = makeBeveledBox(2.2, 0.12, 0.06, 0.01, M.steelSlate());
-    beam.position.set(0, 0.72, sz);
-    g.add(beam);
-    const guard = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.048, 0.022), M.hazardStripe());
-    guard.position.set(0, 0.82, sz * 1.08);
-    g.add(guard);
-    for (const sx of [-0.95, 0, 0.95]) {
-      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.7, 0.065), M.darkSteel());
-      leg.position.set(sx, 0.35, sz);
-      g.add(leg);
-      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 14), M.stainless());
-      foot.position.set(sx, 0.015, sz);
+  // 电机铸铁底座脚
+  for (const sx of [-length * 0.28, length * 0.28]) {
+    for (const sz of [-radius * 0.76, radius * 0.76]) {
+      const foot = makeBeveledBox(0.1, 0.07, 0.09, 0.008, M.castIron());
+      foot.position.set(sx, -radius - 0.02, sz);
       g.add(foot);
     }
   }
-  for (let i = -9; i <= 9; i++) {
-    const roller = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.66, 14), M.stainless());
-    roller.rotation.x = Math.PI / 2;
-    roller.position.set(i * 0.11, 0.73, 0);
-    g.add(roller);
-  }
-  // 光电定位龙门支架
-  for (const sz of [-0.38, 0.38]) {
-    const p = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.5, 0.04), M.stainless());
-    p.position.set(0.28, 1.0, sz);
-    g.add(p);
-  }
-  const gate = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.8), M.darkSteel());
-  gate.position.set(0.28, 1.24, 0);
-  g.add(gate);
-  const sensorLed = new THREE.Mesh(new THREE.SphereGeometry(0.025, 10, 8), M.lampGreen());
-  sensorLed.position.set(0.28, 1.28, 0);
-  g.add(sensorLed);
-
-  // 驱动电机与变频盒
-  const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.24, 16), M.paintBlue());
-  motor.rotation.x = Math.PI / 2;
-  motor.position.set(-0.75, 0.56, 0.48);
-  g.add(motor);
-  const estopBox = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.08), M.paintYellow());
-  estopBox.position.set(0.65, 0.72, 0.42);
-  g.add(estopBox);
-  const estopBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.04, 12), M.lampRed());
-  estopBtn.rotation.x = Math.PI / 2;
-  estopBtn.position.set(0.65, 0.72, 0.47);
-  g.add(estopBtn);
-
-  // 托盘 + 精细燃气表装配半成品
-  for (const sx of [-0.62, 0, 0.62]) {
-    const pallet = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.03, 0.32), M.darkSteel());
-    pallet.position.set(sx, 0.775, 0);
-    g.add(pallet);
-    const unit = makeBeveledBox(0.26, 0.3, 0.2, 0.015, M.castAluminum());
-    unit.position.set(sx, 0.94, 0);
-    g.add(unit);
-    const face = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.09, 0.01), M.meterCounter());
-    face.position.set(sx, 0.98, 0.102);
-    g.add(face);
-  }
   return g;
 }
 
-// 9. 自动装配机械臂（增配谐波减速机关节凸鼓 + 安全防护围栏窗）
-function buildRobotStation() {
+/** 共用重工业立式压力容器/储罐/分离器内核（复刻 TK-101/102/103 全套护栏+爬梯+支腿+混凝土台） */
+function makeVerticalVessel({
+  radius = 0.52,
+  bodyH = 1.65,
+  headH = 0.28,
+  legs = 6,
+  legH = 0.5,
+  plinthH = 0.18,
+  withTopRail = true,
+  withLadder = true,
+  withSightGlass = true,
+  vesselMat = M.stainless(),
+  topNozzleCount = 2,
+} = {}) {
   const g = new THREE.Group();
-  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.4, 0.34, 22), M.darkSteel());
-  plinth.position.y = 0.17;
+  const basePlateSize = radius * 2.55;
+  const anchors = [
+    [-basePlateSize * 0.38, -basePlateSize * 0.38],
+    [basePlateSize * 0.38, -basePlateSize * 0.38],
+    [-basePlateSize * 0.38, basePlateSize * 0.38],
+    [basePlateSize * 0.38, basePlateSize * 0.38],
+  ];
+  const plinth = makeConcretePlinth(basePlateSize, plinthH, basePlateSize, anchors);
   g.add(plinth);
-  const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.25, 0.28, 22), M.paintAmber());
-  turret.position.y = 0.48;
-  g.add(turret);
-  const shoulder = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.26, 18), M.darkSteel());
-  shoulder.rotation.z = Math.PI / 2;
-  shoulder.position.set(0, 0.62, 0);
-  g.add(shoulder);
-  const arm1 = makeBeveledBox(0.14, 0.72, 0.15, 0.015, M.paintAmber());
-  arm1.position.set(0, 0.94, -0.08);
-  arm1.rotation.x = 0.26;
-  g.add(arm1);
-  const elbow = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.24, 18), M.darkSteel());
-  elbow.rotation.z = Math.PI / 2;
-  elbow.position.set(0, 1.26, -0.18);
-  g.add(elbow);
-  const arm2 = makeBeveledBox(0.11, 0.12, 0.68, 0.012, M.castAluminum());
-  arm2.position.set(0, 1.24, 0.16);
-  arm2.rotation.x = 0.22;
-  g.add(arm2);
-  const wrist = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.12, 14), M.darkSteel());
-  wrist.position.set(0, 1.13, 0.46);
-  g.add(wrist);
-  const servoTool = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.022, 0.2, 14), M.stainless());
-  servoTool.position.set(0, 1.0, 0.46);
-  g.add(servoTool);
 
-  for (const sx of [-0.72, 0.72]) {
-    const post = new THREE.Mesh(new THREE.BoxGeometry(0.055, 1.05, 0.055), M.paintYellow());
-    post.position.set(sx, 0.525, -0.58);
-    g.add(post);
+  const legTopY = plinthH + legH;
+  const bodyBottomY = legTopY + headH * 0.35;
+  const bodyCenterY = bodyBottomY + bodyH * 0.5;
+  const bodyTopY = bodyBottomY + bodyH;
+
+  // 圆管支撑腿 + 地脚法兰盘 + 环向交叉加强拉筋（参考 TK-101/102/103 罐底结构）
+  const legMat = M.stainless();
+  const footMat = M.stainless();
+  const legRingR = radius * 0.86;
+  const legPositions = [];
+  for (let i = 0; i < legs; i++) {
+    const a = (i / legs) * Math.PI * 2 + Math.PI / legs;
+    const lx = Math.cos(a) * legRingR;
+    const lz = Math.sin(a) * legRingR;
+    legPositions.push([lx, lz]);
+
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.046, legH + headH * 0.65, 14), legMat);
+    leg.position.set(lx, plinthH + (legH + headH * 0.65) * 0.5, lz);
+    g.add(leg);
+
+    const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.024, 14), footMat);
+    pad.position.set(lx, plinthH + 0.012, lz);
+    g.add(pad);
   }
-  const rail = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.05, 0.045), M.paintYellow());
-  rail.position.set(0, 1.02, -0.58);
-  g.add(rail);
-  const shield = new THREE.Mesh(new THREE.BoxGeometry(1.38, 0.75, 0.02), M.glass());
-  shield.position.set(0, 0.62, -0.58);
-  g.add(shield);
-  return g;
-}
+  for (let i = 0; i < legs; i++) {
+    const p1 = legPositions[i];
+    const p2 = legPositions[(i + 1) % legs];
+    const braceY = plinthH + legH * 0.42;
+    g.add(makePipeSpan([p1[0], braceY, p1[1]], [p2[0], braceY, p2[1]], 0.016, M.stainless()));
+  }
 
-// 10. 气密性检漏台（铝型材框 + 测试表样品 + 差压表 + 工控屏）
-function buildLeakTestBench() {
-  const g = new THREE.Group();
-  const cab = makeBeveledBox(1.48, 0.86, 0.94, 0.02, M.darkSteel());
-  cab.position.y = 0.43;
-  g.add(cab);
-  const deck = makeBeveledBox(1.54, 0.05, 1.0, 0.01, M.stainless());
-  deck.position.y = 0.885;
-  g.add(deck);
-  const hood = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.64, 0.64), M.glass());
-  hood.position.set(-0.14, 1.22, 0);
-  g.add(hood);
-  for (const sx of [-0.6, 0.32]) {
-    for (const sz of [-0.31, 0.31]) {
-      const col = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.82, 0.035), M.stainless());
-      col.position.set(sx, 1.3, sz);
-      g.add(col);
+  // 主筒身 + 上下椭球碟形封头 + 环向焊缝圈
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, bodyH, 36), vesselMat);
+  body.position.y = bodyCenterY;
+  g.add(body);
+
+  const botHead = new THREE.Mesh(makeEllipticalHead(radius, headH), vesselMat);
+  botHead.rotation.x = Math.PI;
+  botHead.position.y = bodyBottomY;
+  g.add(botHead);
+
+  const topHead = new THREE.Mesh(makeEllipticalHead(radius, headH), vesselMat);
+  topHead.position.y = bodyTopY;
+  g.add(topHead);
+
+  // 显性焊缝圈（让纯不锈钢筒身更具真实压力容器分段质感）
+  const seamMat = M.weldSeam();
+  for (const sy of [bodyBottomY, bodyBottomY + bodyH * 0.34, bodyBottomY + bodyH * 0.68, bodyTopY]) {
+    const seam = new THREE.Mesh(new THREE.TorusGeometry(radius + 0.005, 0.009, 8, 36), seamMat);
+    seam.rotation.x = Math.PI / 2;
+    seam.position.y = sy;
+    g.add(seam);
+  }
+
+  // 顶部圆形双层不锈钢安全护栏（参考 TK-101/102/103 顶栏）
+  const topCrownY = bodyTopY + headH;
+  if (withTopRail) {
+    const railR = radius * 0.92;
+    const railH = 0.56;
+    const postCount = 12;
+    const baseRingY = bodyTopY + headH * 0.55;
+    for (let i = 0; i < postCount; i++) {
+      const a = (i / postCount) * Math.PI * 2;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, railH, 8), M.stainless());
+      post.position.set(Math.cos(a) * railR, baseRingY + railH * 0.5, Math.sin(a) * railR);
+      g.add(post);
+    }
+    for (const ry of [baseRingY + railH * 0.52, baseRingY + railH]) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(railR, 0.015, 10, 32), M.stainless());
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = ry;
+      g.add(ring);
     }
   }
-  const topBeam = makeBeveledBox(1.02, 0.08, 0.68, 0.01, M.steelSlate());
-  topBeam.position.set(-0.14, 1.72, 0);
-  g.add(topBeam);
-  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.32, 16), M.stainless());
-  cyl.position.set(-0.14, 1.88, 0);
-  g.add(cyl);
 
-  // 测试罩内部摆放待检燃气表样品
-  const sample = makeBeveledBox(0.32, 0.38, 0.22, 0.015, M.castAluminum());
-  sample.position.set(-0.14, 1.12, 0);
-  g.add(sample);
+  // 顶部人孔盖 & 工艺短接管法兰
+  const manway = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.14, 20), M.stainless());
+  manway.position.set(0, topCrownY + 0.04, 0);
+  const manwayLid = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.036, 20), M.darkSteel());
+  manwayLid.position.set(0, topCrownY + 0.12, 0);
+  g.add(manway, manwayLid);
 
-  const ctrl = makeBeveledBox(0.34, 0.58, 0.5, 0.015, M.steelSlate());
-  ctrl.position.set(0.55, 1.19, 0);
-  g.add(ctrl);
-  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.012), M.screen());
-  scr.position.set(0.55, 1.26, 0.252);
-  g.add(scr);
-  const gauge = makeDialGauge(0.065);
-  gauge.position.set(0.55, 1.04, 0.25);
+  for (let i = 0; i < topNozzleCount; i++) {
+    const nx = i === 0 ? -radius * 0.36 : radius * 0.36;
+    const nz = -radius * 0.2;
+    const noz = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.24, 16), M.stainless());
+    noz.position.set(nx, bodyTopY + headH * 0.72 + 0.1, nz);
+    const fl = makeFlangeAssembly(0.1, 0.055, 6);
+    fl.rotation.z = Math.PI / 2;
+    fl.position.set(nx, bodyTopY + headH * 0.72 + 0.22, nz);
+    g.add(noz, fl);
+  }
+
+  // 右侧全高带防滑横棍工业直爬梯（参考 TK-101 侧梯）
+  if (withLadder) {
+    const ladX = radius + 0.085;
+    const ladW = 0.24;
+    const ladBot = plinthH + 0.04;
+    const ladTop = bodyTopY + headH * 0.55 + (withTopRail ? 0.56 : 0.18);
+    const ladH = ladTop - ladBot;
+    for (const sz of [-ladW * 0.5, ladW * 0.5]) {
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, ladH, 8), M.stainless());
+      rail.position.set(ladX, ladBot + ladH * 0.5, sz);
+      g.add(rail);
+    }
+    const rungStep = 0.22;
+    for (let ry = ladBot + 0.16; ry < ladTop - 0.1; ry += rungStep) {
+      const rung = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, ladW, 8), M.stainless());
+      rung.rotation.x = Math.PI / 2;
+      rung.position.set(ladX, ry, 0);
+      g.add(rung);
+    }
+    // 爬梯与罐壁固定支撑耳
+    for (const ry of [bodyBottomY + 0.2, bodyCenterY, bodyTopY - 0.1]) {
+      for (const sz of [-ladW * 0.5, ladW * 0.5]) {
+        const bracket = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.025, 0.025), M.darkSteel());
+        bracket.position.set(radius + 0.04, ry, sz);
+        g.add(bracket);
+      }
+    }
+  }
+
+  // 正前偏右侧磁翻板液位计与铭牌
+  if (withSightGlass) {
+    const sgZ = radius + 0.065;
+    const sgH = bodyH * 0.68;
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, sgH, 12), M.stainless());
+    tube.position.set(-radius * 0.24, bodyCenterY, sgZ);
+    g.add(tube);
+    for (const dy of [-sgH * 0.45, sgH * 0.45]) {
+      const conn = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.09, 10), M.stainless());
+      conn.rotation.x = Math.PI / 2;
+      conn.position.set(-radius * 0.24, bodyCenterY + dy, radius + 0.025);
+      g.add(conn);
+    }
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.13, 0.012), M.nameplate());
+    plate.position.set(0.08, bodyCenterY + 0.12, radius + 0.008);
+    g.add(plate);
+  }
+
+  return { group: g, bodyBottomY, bodyCenterY, bodyTopY, plinthH };
+}
+
+// =====================================================================
+// 1. TANK：工艺立式缓冲储罐（参考 TK-101 / TK-102 / TK-103）
+// =====================================================================
+function buildTank() {
+  const { group: g, bodyBottomY, bodyTopY } = makeVerticalVessel({
+    radius: 0.54,
+    bodyH: 1.68,
+    headH: 0.3,
+    legs: 6,
+    legH: 0.48,
+    plinthH: 0.18,
+    withTopRail: true,
+    withLadder: true,
+    withSightGlass: true,
+  });
+
+  // 左右工艺接管（底部出液法兰 + 上部进液弯接管）
+  const pipeInY = bodyTopY - 0.16;
+  const inPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.38, 18), M.stainless());
+  inPipe.rotation.z = Math.PI / 2;
+  inPipe.position.set(-0.62, pipeInY, 0);
+  const fIn = makeFlangeAssembly(0.14, 0.075, 8);
+  fIn.position.set(-0.81, pipeInY, 0);
+  g.add(inPipe, fIn);
+
+  const pipeOutY = bodyBottomY + 0.18;
+  const outPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.38, 18), M.stainless());
+  outPipe.rotation.z = Math.PI / 2;
+  outPipe.position.set(0.62, pipeOutY, 0);
+  const fOut = makeFlangeAssembly(0.14, 0.075, 8);
+  fOut.position.set(0.81, pipeOutY, 0);
+  g.add(outPipe, fOut);
+
+  const gauge = makeDialGauge(0.068);
+  gauge.position.set(-0.32, bodyTopY - 0.05, 0.56);
   g.add(gauge);
-  const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.1, 14), M.lampGreen());
-  lamp.position.set(0.55, 1.53, 0);
-  g.add(lamp);
+
+  addPort(g, 'in', -0.83, pipeInY, 0, -1, 0, 0);
+  addPort(g, 'out', 0.83, pipeOutY, 0, 1, 0, 0);
+  return g;
+}
+
+// =====================================================================
+// 2. WATER_PUMP：重型变频离心泵组（完全对标 P-201 / P-203）
+// =====================================================================
+function buildWaterPump() {
+  const g = new THREE.Group();
+  const plinthH = 0.16;
+  g.add(
+    makeConcretePlinth(1.74, plinthH, 0.86, [
+      [-0.74, -0.31],
+      [0.74, -0.31],
+      [-0.74, 0.31],
+      [0.74, 0.31],
+    ]),
+  );
+
+  // 铸铁重型共面机座
+  const skidDeck = makeBeveledBox(1.48, 0.07, 0.6, 0.012, M.castIron());
+  skidDeck.position.set(0, plinthH + 0.035, 0);
+  g.add(skidDeck);
+
+  const shaftY = plinthH + 0.34;
+  // 工业钴蓝离心蜗壳泵头
+  const volute = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.17, 24), M.industrialBlue());
+  volute.rotation.z = Math.PI / 2;
+  volute.position.set(-0.46, shaftY, 0);
+  g.add(volute);
+
+  // 蜗壳加强耳肋
+  const pumpFoot = makeBeveledBox(0.26, 0.14, 0.32, 0.01, M.industrialBlue());
+  pumpFoot.position.set(-0.46, plinthH + 0.14, 0);
+  g.add(pumpFoot);
+
+  // 吸入短管 + 法兰 (左侧)
+  const sucPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.088, 0.095, 0.28, 20), M.industrialBlue());
+  sucPipe.rotation.z = Math.PI / 2;
+  sucPipe.position.set(-0.66, shaftY, 0);
+  const fIn = makeFlangeAssembly(0.16, 0.088, 8);
+  fIn.position.set(-0.8, shaftY, 0);
+  g.add(sucPipe, fIn);
+
+  // 顶部吐出直立颈管 + 法兰 + 压力表（也可向右弯出接管道，出口设在右前方便水平接管）
+  const disPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.082, 0.088, 0.34, 20), M.industrialBlue());
+  disPipe.position.set(-0.46, shaftY + 0.24, 0);
+  const fOut = makeFlangeAssembly(0.15, 0.082, 8);
+  fOut.rotation.z = Math.PI / 2;
+  fOut.position.set(-0.46, shaftY + 0.41, 0);
+  g.add(disPipe, fOut);
+
+  // 泵头轴承托架
+  const bearing = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.22, 18), M.castIron());
+  bearing.rotation.z = Math.PI / 2;
+  bearing.position.set(-0.28, shaftY, 0);
+  g.add(bearing);
+
+  // 标志性细节：不锈钢冲孔金属网联轴器安全护罩（可隐约透视内部传动轴）
+  const shaftCore = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.26, 14), M.castIron());
+  shaftCore.rotation.z = Math.PI / 2;
+  shaftCore.position.set(-0.08, shaftY, 0);
+  const couplingFlange = new THREE.Mesh(new THREE.CylinderGeometry(0.072, 0.072, 0.06, 16), M.stainless());
+  couplingFlange.rotation.z = Math.PI / 2;
+  couplingFlange.position.set(-0.08, shaftY, 0);
+  g.add(shaftCore, couplingFlange);
+
+  const guardArch = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.125, 0.125, 0.24, 20, 1, true, -Math.PI * 0.65, Math.PI * 1.3),
+    M.perforatedMetal(),
+  );
+  guardArch.rotation.z = Math.PI / 2;
+  guardArch.rotation.x = Math.PI * 0.5;
+  guardArch.position.set(-0.08, shaftY, 0);
+  g.add(guardArch);
+
+  for (const gx of [-0.19, 0.03]) {
+    const rimRing = new THREE.Mesh(new THREE.TorusGeometry(0.125, 0.011, 8, 20), M.stainless());
+    rimRing.rotation.y = Math.PI / 2;
+    rimRing.position.set(gx, shaftY, 0);
+    g.add(rimRing);
+  }
+
+  // 后置 YE3 钴蓝散热片重型电机
+  const motor = makeIndustrialMotor({ radius: 0.19, length: 0.48, bodyMat: M.industrialBlue(), ribCount: 20 });
+  motor.position.set(0.32, shaftY, 0);
+  g.add(motor);
+
+  const gauge = makeDialGauge(0.055);
+  gauge.position.set(-0.46, shaftY + 0.3, 0.14);
+  const nameplate = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.085, 0.01), M.nameplate());
+  nameplate.position.set(0.3, shaftY + 0.02, 0.21);
+  g.add(gauge, nameplate);
+
+  addPort(g, 'in', -0.82, shaftY, 0, -1, 0, 0);
+  addPort(g, 'out', -0.46, shaftY + 0.43, 0, 0, 1, 0);
+  return g;
+}
+
+// =====================================================================
+// 3. HEAT_EXCHANGER：板式换热器（1:1 复刻 HX-301 板式换热器）
+// =====================================================================
+function buildHeatExchanger() {
+  const g = new THREE.Group();
+  const plinthH = 0.16;
+  g.add(
+    makeConcretePlinth(1.26, plinthH, 0.94, [
+      [-0.48, -0.34],
+      [0.48, -0.34],
+      [-0.48, 0.34],
+      [0.48, 0.34],
+    ]),
+  );
+
+  const footY = plinthH + 0.035;
+  const frameH = 1.38;
+  const frameW = 0.64;
+  const frameCenterY = footY + frameH * 0.5;
+
+  // 前固定压紧板（工业钴蓝加厚钢板 + 侧缘螺栓孔位加强筋）
+  const frontPlate = makeBeveledBox(0.1, frameH, frameW, 0.014, M.industrialBlue());
+  frontPlate.position.set(-0.34, frameCenterY, 0);
+  const backPlate = makeBeveledBox(0.09, frameH, frameW, 0.014, M.industrialBlue());
+  backPlate.position.set(0.28, frameCenterY, 0);
+  g.add(frontPlate, backPlate);
+
+  // 压紧板底部重型地脚座
+  for (const px of [-0.34, 0.28]) {
+    const leg = makeBeveledBox(0.14, 0.07, frameW + 0.08, 0.008, M.castIron());
+    leg.position.set(px, plinthH + 0.035, 0);
+    g.add(leg);
+  }
+
+  // 右端落地导杆支撑柱（鹅颈柱）
+  const endColumn = makeBeveledBox(0.09, frameH + 0.14, 0.12, 0.01, M.industrialBlue());
+  endColumn.position.set(0.48, frameCenterY + 0.05, 0);
+  const colFoot = makeBeveledBox(0.16, 0.06, 0.24, 0.008, M.castIron());
+  colFoot.position.set(0.48, plinthH + 0.03, 0);
+  g.add(endColumn, colFoot);
+
+  // 上下两根 304 不锈钢圆柱形导杆贯穿前后
+  const topGuideY = footY + frameH + 0.04;
+  const botGuideY = footY + 0.08;
+  for (const gy of [topGuideY, botGuideY]) {
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.94, 16), M.stainless());
+    bar.rotation.z = Math.PI / 2;
+    bar.position.set(0.06, gy, 0);
+    g.add(bar);
+  }
+
+  // 核心波纹不锈钢板片叠层组（HX-301 最具辨识度的密排板片芯体）
+  const packCore = new THREE.Mesh(new THREE.BoxGeometry(0.51, frameH - 0.16, frameW - 0.1), M.hxPlates());
+  packCore.position.set(-0.03, frameCenterY, 0);
+  g.add(packCore);
+
+  // 四角 / 中部 8 根高强夹紧拉杆螺栓与六角螺母
+  const rodMat = M.stainless();
+  const nutMat = M.darkSteel();
+  const boltGeo = new THREE.CylinderGeometry(0.016, 0.016, 0.78, 12);
+  const nutGeo = new THREE.CylinderGeometry(0.028, 0.028, 0.03, 6);
+  for (const sz of [-frameW * 0.44, frameW * 0.44]) {
+    for (const sy of [footY + 0.18, footY + 0.52, footY + 0.88, footY + 1.2]) {
+      const rod = new THREE.Mesh(boltGeo, rodMat);
+      rod.rotation.z = Math.PI / 2;
+      rod.position.set(-0.03, sy, sz);
+      g.add(rod);
+      for (const nx of [-0.41, 0.35]) {
+        const nut = new THREE.Mesh(nutGeo, nutMat);
+        nut.rotation.z = Math.PI / 2;
+        nut.position.set(nx, sy, sz);
+        g.add(nut);
+      }
+    }
+  }
+
+  // 4 个大口径热侧（不锈钢）与冷侧（钴蓝）接管及法兰
+  const portSpecs = [
+    { id: 'in', y: footY + frameH - 0.24, z: -0.16, xSide: -1, mat: M.stainless() },
+    { id: 'out', y: footY + frameH - 0.24, z: 0.16, xSide: 1, mat: M.stainless() },
+    { id: 'cold_in', y: footY + 0.24, z: -0.16, xSide: -1, mat: M.industrialBlue() },
+    { id: 'cold_out', y: footY + 0.24, z: 0.16, xSide: 1, mat: M.industrialBlue() },
+  ];
+  for (const ps of portSpecs) {
+    const startX = ps.xSide < 0 ? -0.44 : 0.38;
+    const endX = ps.xSide < 0 ? -0.57 : 0.51;
+    const midX = (startX + endX) * 0.5;
+    const noz = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.068, 0.22, 18), ps.mat);
+    noz.rotation.z = Math.PI / 2;
+    noz.position.set(midX, ps.y, ps.z);
+    const fl = makeFlangeAssembly(0.128, 0.068, 8, ps.mat);
+    fl.position.set(endX, ps.y, ps.z);
+    g.add(noz, fl);
+    addPort(g, ps.id, endX + ps.xSide * 0.02, ps.y, ps.z, ps.xSide, 0, 0);
+  }
+
+  const nameplate = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.12, 0.22), M.nameplate());
+  nameplate.position.set(-0.395, frameCenterY + 0.18, 0);
+  g.add(nameplate);
+
+  return g;
+}
+
+// =====================================================================
+// 4. HENG_GUANG_SKID：重工业双路调压计量撬（304不锈钢管汇 + 铸铁机架）
+// =====================================================================
+function buildHengGuangSkid() {
+  const g = new THREE.Group();
+  const plinthH = 0.12;
+  g.add(
+    makeConcretePlinth(2.96, plinthH, 1.72, [
+      [-1.32, -0.7],
+      [1.32, -0.7],
+      [-1.32, 0.7],
+      [1.32, 0.7],
+    ]),
+  );
+
+  // 槽钢橇座平台
+  const frameH = 0.09;
+  const frameY = plinthH + frameH * 0.5;
+  const baseBeam = makeBeveledBox(2.74, frameH, 1.5, 0.012, M.castIron());
+  baseBeam.position.y = frameY;
+  const deckPlate = new THREE.Mesh(new THREE.BoxGeometry(2.64, 0.018, 1.4), M.diamondPlate());
+  deckPlate.position.y = plinthH + frameH + 0.009;
+  g.add(baseBeam, deckPlate);
+
+  const deckTopY = plinthH + frameH + 0.018;
+  const pipeY = deckTopY + 0.42;
+  const pipeR = 0.062;
+  const pipeMat = M.stainless();
+
+  // 进口集管 & 出口汇管
+  g.add(makePipeSpan([-1.14, pipeY, -0.44], [-1.14, pipeY, 0.44], pipeR * 1.15, pipeMat));
+  g.add(makePipeSpan([1.14, pipeY, -0.44], [1.14, pipeY, 0.44], pipeR * 1.15, pipeMat));
+  g.add(makePipeSpan([-1.36, pipeY, 0], [-1.14, pipeY, 0], pipeR * 1.15, pipeMat));
+  g.add(makePipeSpan([1.14, pipeY, 0], [1.36, pipeY, 0], pipeR * 1.15, pipeMat));
+
+  const fIn = makeFlangeAssembly(0.145, pipeR * 1.15, 8);
+  fIn.position.set(-1.36, pipeY, 0);
+  const fOut = makeFlangeAssembly(0.145, pipeR * 1.15, 8);
+  fOut.position.set(1.36, pipeY, 0);
+  g.add(fIn, fOut);
+
+  // 管道立柱支架
+  for (const [sx, sz] of [
+    [-1.14, -0.4],
+    [-1.14, 0.4],
+    [1.14, -0.4],
+    [1.14, 0.4],
+  ]) {
+    const post = makePipeStanchion(sx, pipeY, sz, pipeR * 1.15);
+    post.position.y = deckTopY;
+    post.scale.y = (pipeY - deckTopY) / pipeY;
+    g.add(post);
+  }
+
+  // 主副双路工艺支路（z = ±0.42）：卧式过滤筒 + 调压器 + 流量计 + 手轮球阀
+  for (const branchZ of [-0.42, 0.42]) {
+    g.add(makePipeSpan([-1.14, pipeY, branchZ], [1.14, pipeY, branchZ], pipeR, pipeMat));
+
+    // 两端截断法兰与手轮阀
+    for (const vx of [-0.88, 0.88]) {
+      const flL = makeFlangeAssembly(0.115, pipeR, 6);
+      flL.position.set(vx - 0.11, pipeY, branchZ);
+      const flR = makeFlangeAssembly(0.115, pipeR, 6);
+      flR.position.set(vx + 0.11, pipeY, branchZ);
+      const valveBody = new THREE.Mesh(new THREE.SphereGeometry(0.105, 16, 14), M.castIron());
+      valveBody.position.set(vx, pipeY, branchZ);
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.17, 10), M.stainless());
+      stem.position.set(vx, pipeY + 0.12, branchZ);
+      const hw = makeHandwheel(0.115, branchZ < 0 ? M.industrialBlue() : M.stainless());
+      hw.position.set(vx, pipeY + 0.21, branchZ);
+      g.add(flL, flR, valveBody, stem, hw);
+    }
+
+    // 卧式旋风过滤器
+    const filterDrum = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.145, 0.145, 0.42, 24),
+      M.stainless(),
+    );
+    filterDrum.rotation.z = Math.PI / 2;
+    filterDrum.position.set(-0.42, pipeY, branchZ);
+    const filterSeam = new THREE.Mesh(new THREE.TorusGeometry(0.148, 0.008, 8, 24), M.weldSeam());
+    filterSeam.rotation.y = Math.PI / 2;
+    filterSeam.position.set(-0.42, pipeY, branchZ);
+    const gauge = makeDialGauge(0.058);
+    gauge.position.set(-0.42, pipeY + 0.2, branchZ + 0.06);
+    g.add(filterDrum, filterSeam, gauge);
+
+    // 指挥器调压阀
+    const regCap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.16, 0.16, 0.09, 24),
+      branchZ < 0 ? M.industrialBlue() : M.castIron(),
+    );
+    regCap.position.set(0.02, pipeY + 0.17, branchZ);
+    const regTower = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.068, 0.18, 16), M.stainless());
+    regTower.position.set(0.02, pipeY + 0.3, branchZ);
+    g.add(regCap, regTower);
+
+    // 超声/涡轮流量计段
+    const meterBody = new THREE.Mesh(new THREE.CylinderGeometry(0.088, 0.088, 0.26, 20), M.stainless());
+    meterBody.rotation.z = Math.PI / 2;
+    meterBody.position.set(0.46, pipeY, branchZ);
+    const meterHead = makeBeveledBox(0.14, 0.13, 0.11, 0.01, M.industrialBlue());
+    meterHead.position.set(0.46, pipeY + 0.21, branchZ);
+    const lcd = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.075, 0.01), M.screen());
+    lcd.position.set(0.46, pipeY + 0.21, branchZ + 0.056);
+    g.add(meterBody, meterHead, lcd);
+  }
+
+  // 防爆现场数据控制箱（右侧边缘独立不锈钢立柱）
+  const post = new THREE.Mesh(new THREE.BoxGeometry(0.065, 1.15, 0.065), M.castIron());
+  post.position.set(0.84, deckTopY + 0.575, 0.66);
+  const cab = makeBeveledBox(0.42, 0.52, 0.24, 0.012, M.stainless());
+  cab.position.set(0.84, deckTopY + 0.96, 0.66);
+  const hmi = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.2, 0.012), M.screen());
+  hmi.position.set(0.84, deckTopY + 1.0, 0.785);
+  const accentStrip = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.036, 0.014), M.industrialBlue());
+  accentStrip.position.set(0.84, deckTopY + 1.18, 0.782);
+  g.add(post, cab, hmi, accentStrip);
+
+  addPort(g, 'in', -1.39, pipeY, 0, -1, 0, 0);
+  addPort(g, 'out', 1.39, pipeY, 0, 1, 0, 0);
+  return g;
+}
+
+// =====================================================================
+// 5. FS：立式旋风分离过滤器（重工业全套不锈钢梯栏+混凝土基座）
+// =====================================================================
+function buildFilterSeparator() {
+  const { group: g, bodyBottomY, bodyTopY } = makeVerticalVessel({
+    radius: 0.4,
+    bodyH: 1.48,
+    headH: 0.24,
+    legs: 4,
+    legH: 0.42,
+    plinthH: 0.14,
+    withTopRail: true,
+    withLadder: true,
+    withSightGlass: true,
+  });
+
+  const inY = bodyTopY - 0.34;
+  const outY = bodyBottomY + 0.32;
+  const pipeIn = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.34, 18), M.stainless());
+  pipeIn.rotation.z = Math.PI / 2;
+  pipeIn.position.set(-0.48, inY, 0);
+  const fIn = makeFlangeAssembly(0.145, 0.08, 8);
+  fIn.position.set(-0.65, inY, 0);
+
+  const pipeOut = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.34, 18), M.stainless());
+  pipeOut.rotation.z = Math.PI / 2;
+  pipeOut.position.set(0.48, outY, 0);
+  const fOut = makeFlangeAssembly(0.145, 0.08, 8);
+  fOut.position.set(0.65, outY, 0);
+  g.add(pipeIn, fIn, pipeOut, fOut);
+
+  // 快开盲板盖 & 差压表
+  const closure = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.07, 20), M.industrialBlue());
+  closure.position.set(0, bodyTopY + 0.24 + 0.06, 0);
+  const dpGauge = makeDialGauge(0.062);
+  dpGauge.position.set(-0.22, (inY + outY) * 0.5, 0.42);
+  g.add(closure, dpGauge);
+
+  addPort(g, 'in', -0.67, inY, 0, -1, 0, 0);
+  addPort(g, 'out', 0.67, outY, 0, 1, 0, 0);
+  return g;
+}
+
+// =====================================================================
+// 6. DOSING_TANK：加药搅拌反应罐（不锈钢罐 + 钴蓝减速机电机 + 梯栏）
+// =====================================================================
+function buildDosingTank() {
+  const { group: g, bodyBottomY, bodyTopY } = makeVerticalVessel({
+    radius: 0.44,
+    bodyH: 1.15,
+    headH: 0.18,
+    legs: 4,
+    legH: 0.32,
+    plinthH: 0.14,
+    withTopRail: true,
+    withLadder: false,
+    withSightGlass: true,
+    topNozzleCount: 1,
+  });
+
+  // 顶部中心立式搅拌减速电机
+  const mount = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.16, 0.1, 18), M.castIron());
+  mount.position.set(0, bodyTopY + 0.22, 0);
+  const agitator = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.28, 20), M.industrialBlue());
+  agitator.position.set(0, bodyTopY + 0.4, 0);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.06, 20), M.castIron());
+  cap.position.set(0, bodyTopY + 0.57, 0);
+  g.add(mount, agitator, cap);
+
+  const portY = bodyBottomY + 0.14;
+  const pIn = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.24, 16), M.stainless());
+  pIn.rotation.z = Math.PI / 2;
+  pIn.position.set(-0.48, bodyTopY - 0.15, 0);
+  const fIn = makeFlangeAssembly(0.105, 0.055, 6);
+  fIn.position.set(-0.6, bodyTopY - 0.15, 0);
+
+  const pOut = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.24, 16), M.stainless());
+  pOut.rotation.z = Math.PI / 2;
+  pOut.position.set(0.48, portY, 0);
+  const fOut = makeFlangeAssembly(0.105, 0.055, 6);
+  fOut.position.set(0.6, portY, 0);
+  g.add(pIn, fIn, pOut, fOut);
+
+  addPort(g, 'in', -0.62, bodyTopY - 0.15, 0, -1, 0, 0);
+  addPort(g, 'out', 0.62, portY, 0, 1, 0, 0);
+  return g;
+}
+
+// =====================================================================
+// 7-11. 阀门与变送器统一高精重工业结构：HOV / MOV / SSV / PCV / PV / INSTR
+// =====================================================================
+function makeValveCore(pipeR = 0.088, bodyMat = M.stainless()) {
+  const g = new THREE.Group();
+  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(pipeR, pipeR, 0.66, 22), M.stainless());
+  pipe.rotation.z = Math.PI / 2;
+  g.add(pipe);
+  const centerBody = new THREE.Mesh(new THREE.SphereGeometry(pipeR * 1.5, 22, 18), bodyMat);
+  g.add(centerBody);
+  const midFlange = new THREE.Mesh(new THREE.CylinderGeometry(pipeR * 1.68, pipeR * 1.68, 0.036, 22), M.stainless());
+  midFlange.position.y = pipeR * 0.95;
+  g.add(midFlange);
+  const f1 = makeFlangeAssembly(pipeR * 1.78, pipeR, 8);
+  f1.position.x = -0.33;
+  const f2 = makeFlangeAssembly(pipeR * 1.78, pipeR, 8);
+  f2.position.x = 0.33;
+  g.add(f1, f2);
+  addPort(g, 'in', -0.35, 0, 0, -1, 0, 0);
+  addPort(g, 'out', 0.35, 0, 0, 1, 0, 0);
+  return g;
+}
+
+function buildValveHOV() {
+  const g = makeValveCore(0.088, M.castIron());
+  const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.088, 0.24, 18), M.stainless());
+  bonnet.position.y = 0.19;
+  const yoke = makeBeveledBox(0.14, 0.16, 0.06, 0.006, M.castIron());
+  yoke.position.y = 0.34;
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.24, 12), M.stainless());
+  stem.position.y = 0.42;
+  const hw = makeHandwheel(0.16, M.stainless());
+  hw.position.y = 0.5;
+  g.add(bonnet, yoke, stem, hw);
+  return g;
+}
+
+function buildValveMOV() {
+  const g = makeValveCore(0.088, M.castIron());
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.075, 0.22, 18), M.stainless());
+  neck.position.y = 0.18;
+  const actBody = makeBeveledBox(0.28, 0.24, 0.24, 0.014, M.industrialBlue());
+  actBody.position.y = 0.38;
+  const motorSide = new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.078, 0.2, 18), M.castIron());
+  motorSide.rotation.z = Math.PI / 2;
+  motorSide.position.set(-0.2, 0.38, 0);
+  const hw = makeHandwheel(0.11, M.stainless());
+  hw.rotation.z = Math.PI / 2;
+  hw.position.set(0.19, 0.38, 0);
+  const indicator = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, 0.01), M.screen());
+  indicator.position.set(0, 0.39, 0.122);
+  g.add(neck, actBody, motorSide, hw, indicator);
+  return g;
+}
+
+function buildValveSSV() {
+  const g = makeValveCore(0.088, M.castIron());
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.18, 18), M.stainless());
+  neck.position.y = 0.18;
+  const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 0.38, 22), M.castIron());
+  cylinder.position.y = 0.44;
+  const topCap = new THREE.Mesh(new THREE.CylinderGeometry(0.145, 0.145, 0.04, 22), M.stainless());
+  topCap.position.y = 0.65;
+  const redBand = new THREE.Mesh(new THREE.CylinderGeometry(0.138, 0.138, 0.036, 22), M.paintRed());
+  redBand.position.y = 0.61;
+  const solenoid = makeBeveledBox(0.12, 0.13, 0.12, 0.008, M.industrialBlue());
+  solenoid.position.set(0.17, 0.4, 0.05);
+  g.add(neck, cylinder, topCap, redBand, solenoid);
+  return g;
+}
+
+function buildValvePCV() {
+  const g = makeValveCore(0.088, M.stainless());
+  const diaphragm = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.09, 26), M.industrialBlue());
+  diaphragm.position.y = 0.24;
+  const rimBoltGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.11, 6);
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    const b = new THREE.Mesh(rimBoltGeo, M.stainless());
+    b.position.set(Math.cos(a) * 0.2, 0.24, Math.sin(a) * 0.2);
+    g.add(b);
+  }
+  const springTower = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.088, 0.28, 18), M.stainless());
+  springTower.position.y = 0.42;
+  const pilot = makeBeveledBox(0.11, 0.14, 0.11, 0.008, M.castIron());
+  pilot.position.set(0.16, 0.38, 0.12);
+  g.add(diaphragm, springTower, pilot);
+  return g;
+}
+
+function buildValvePV() {
+  const g = new THREE.Group();
+  const baseFlange = makeFlangeAssembly(0.155, 0.08, 8);
+  baseFlange.rotation.z = Math.PI / 2;
+  baseFlange.position.y = 0.02;
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.26, 20), M.castIron());
+  body.position.y = 0.15;
+  const sideFlange = makeFlangeAssembly(0.145, 0.075, 8);
+  sideFlange.position.set(0.24, 0.15, 0);
+  const sideNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.22, 18), M.stainless());
+  sideNeck.rotation.z = Math.PI / 2;
+  sideNeck.position.set(0.13, 0.15, 0);
+
+  const springBonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.105, 0.36, 20), M.stainless());
+  springBonnet.position.y = 0.44;
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.09, 20), M.paintRed());
+  cap.position.y = 0.65;
+  const gauge = makeDialGauge(0.05);
+  gauge.position.set(0, 0.2, 0.12);
+  g.add(baseFlange, body, sideNeck, sideFlange, springBonnet, cap, gauge);
+
+  addPort(g, 'in', 0, 0, 0, 0, -1, 0);
+  addPort(g, 'out', 0.26, 0.15, 0, 1, 0, 0);
+  return g;
+}
+
+function buildInstr() {
+  const g = new THREE.Group();
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3, 12), M.stainless());
+  stem.position.y = 0.15;
+  const manifold = makeBeveledBox(0.11, 0.11, 0.09, 0.008, M.stainless());
+  manifold.position.y = 0.32;
+  const housing = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.14, 22), M.industrialBlue());
+  housing.rotation.x = Math.PI / 2;
+  housing.position.y = 0.45;
+  const face = new THREE.Mesh(new THREE.CylinderGeometry(0.076, 0.076, 0.145, 22), M.screen());
+  face.rotation.x = Math.PI / 2;
+  face.position.y = 0.45;
+  const topBox = makeBeveledBox(0.13, 0.07, 0.09, 0.006, M.castIron());
+  topBox.position.y = 0.56;
+  g.add(stem, manifold, housing, face, topBox);
+  addPort(g, 'in', 0, 0, 0, 0, -1, 0);
+  addPort(g, 'out', 0, 0.56, 0, 0, 1, 0);
+  return g;
+}
+
+// =====================================================================
+// 12-15. 燃气表、流量计、电磁流量计、音速喷嘴标定台
+// =====================================================================
+function buildMagMeter() {
+  const g = new THREE.Group();
+  const basePlate = makeConcretePlinth(0.84, 0.1, 0.54);
+  g.add(basePlate);
+  const pipeY = 0.34;
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.56, 24), M.industrialBlue());
+  body.rotation.z = Math.PI / 2;
+  body.position.y = pipeY;
+  const centerWrap = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.24, 24), M.stainless());
+  centerWrap.rotation.z = Math.PI / 2;
+  centerWrap.position.y = pipeY;
+  const f1 = makeFlangeAssembly(0.185, 0.12, 8);
+  f1.position.set(-0.29, pipeY, 0);
+  const f2 = makeFlangeAssembly(0.185, 0.12, 8);
+  f2.position.set(0.29, pipeY, 0);
+
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.044, 0.22, 14), M.stainless());
+  neck.position.set(0, pipeY + 0.22, 0);
+  const head = makeBeveledBox(0.22, 0.18, 0.15, 0.012, M.castIron());
+  head.position.set(0, pipeY + 0.4, 0);
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.11, 0.01), M.screen());
+  scr.position.set(0, pipeY + 0.4, 0.078);
+  g.add(body, centerWrap, f1, f2, neck, head, scr);
+
+  addPort(g, 'in', -0.31, pipeY, 0, -1, 0, 0);
+  addPort(g, 'out', 0.31, pipeY, 0, 1, 0, 0);
+  return g;
+}
+
+function buildUltrasonicMeter() {
+  const g = new THREE.Group();
+  const cradle = makeConcretePlinth(0.86, 0.1, 0.52);
+  g.add(cradle);
+  const pipeY = 0.32;
+  const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.68, 24), M.stainless());
+  tube.rotation.z = Math.PI / 2;
+  tube.position.y = pipeY;
+  const f1 = makeFlangeAssembly(0.175, 0.115, 8);
+  f1.position.set(-0.34, pipeY, 0);
+  const f2 = makeFlangeAssembly(0.175, 0.115, 8);
+  f2.position.set(0.34, pipeY, 0);
+  g.add(tube, f1, f2);
+
+  // 超声波声道传感器探头斜插对角分布
+  for (const sx of [-0.14, 0.14]) {
+    const transducer = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.13, 12), M.castIron());
+    transducer.rotation.z = sx < 0 ? 0.55 : -0.55;
+    transducer.position.set(sx, pipeY + 0.09, 0.095);
+    g.add(transducer);
+  }
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.044, 0.18, 12), M.stainless());
+  neck.position.set(0, pipeY + 0.19, 0);
+  const flowComputer = makeBeveledBox(0.24, 0.18, 0.15, 0.012, M.industrialBlue());
+  flowComputer.position.set(0, pipeY + 0.35, 0);
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.11, 0.01), M.screen());
+  scr.position.set(0, pipeY + 0.35, 0.077);
+  g.add(neck, flowComputer, scr);
+
+  addPort(g, 'in', -0.36, pipeY, 0, -1, 0, 0);
+  addPort(g, 'out', 0.36, pipeY, 0, 1, 0, 0);
+  return g;
+}
+
+function buildRootsMeter() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(0.92, 0.1, 0.56));
+  const pipeY = 0.34;
+  const waist = makeBeveledBox(0.36, 0.28, 0.32, 0.025, M.castIron());
+  waist.position.y = pipeY;
+  const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.72, 22), M.stainless());
+  tube.rotation.z = Math.PI / 2;
+  tube.position.y = pipeY;
+  const f1 = makeFlangeAssembly(0.175, 0.11, 8);
+  f1.position.set(-0.36, pipeY, 0);
+  const f2 = makeFlangeAssembly(0.175, 0.11, 8);
+  f2.position.set(0.36, pipeY, 0);
+
+  const counterHead = makeBeveledBox(0.24, 0.19, 0.16, 0.012, M.stainless());
+  counterHead.position.set(0, pipeY + 0.25, 0);
+  const face = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.012), M.meterCounter());
+  face.position.set(0, pipeY + 0.25, 0.082);
+  const cap = makeBeveledBox(0.2, 0.04, 0.12, 0.006, M.industrialBlue());
+  cap.position.set(0, pipeY + 0.36, 0);
+  g.add(waist, tube, f1, f2, counterHead, face, cap);
+
+  addPort(g, 'in', -0.38, pipeY, 0, -1, 0, 0);
+  addPort(g, 'out', 0.38, pipeY, 0, 1, 0, 0);
+  return g;
+}
+
+function buildMembraneMeter() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(0.66, 0.08, 0.46));
+  const body = makeBeveledBox(0.46, 0.52, 0.3, 0.024, M.castAluminum());
+  body.position.y = 0.36;
+  const belt = makeBeveledBox(0.48, 0.036, 0.32, 0.008, M.stainless());
+  belt.position.y = 0.44;
+  const badge = makeBeveledBox(0.32, 0.18, 0.02, 0.005, M.darkSteel());
+  badge.position.set(0, 0.44, 0.155);
+  const counter = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.14, 0.012), M.meterCounter());
+  counter.position.set(0, 0.44, 0.168);
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.01), M.nameplate());
+  plate.position.set(0, 0.25, 0.156);
+  g.add(body, belt, badge, counter, plate);
+
+  for (const sx of [-0.14, 0.14]) {
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.14, 14), M.stainless());
+    neck.position.set(sx, 0.67, 0);
+    const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.042, 6), M.stainless());
+    nut.position.set(sx, 0.72, 0);
+    g.add(neck, nut);
+  }
+  addPort(g, 'in', -0.14, 0.74, 0, 0, 1, 0);
+  addPort(g, 'out', 0.14, 0.74, 0, 0, 1, 0);
+  return g;
+}
+
+function buildCalibrationRig() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(2.36, 0.1, 1.18));
+  const frame = makeBeveledBox(2.2, 0.08, 1.0, 0.01, M.castIron());
+  frame.position.y = 0.14;
+  const bench = makeBeveledBox(2.14, 0.05, 0.94, 0.008, M.stainless());
+  bench.position.y = 0.84;
+  g.add(frame, bench);
+
+  for (const sx of [-0.98, 0.98]) {
+    for (const sz of [-0.4, 0.4]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.7, 0.065), M.castIron());
+      leg.position.set(sx, 0.49, sz);
+      g.add(leg);
+    }
+  }
+  // 滞止压力容器稳压罐
+  const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.64, 24), M.stainless());
+  tank.position.set(-0.74, 1.18, -0.18);
+  const topCap = new THREE.Mesh(makeEllipticalHead(0.2, 0.09), M.stainless());
+  topCap.position.set(-0.74, 1.5, -0.18);
+  g.add(tank, topCap);
+
+  // 音速文丘里喷嘴组
+  for (let i = 0; i < 4; i++) {
+    const zPos = -0.26 + i * 0.18;
+    const nPipe = makePipeSpan([-0.5, 1.08, zPos], [0.58, 1.08, zPos], 0.025, M.stainless());
+    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.03, 0.16, 16), M.industrialBlue());
+    nozzle.rotation.z = Math.PI / 2;
+    nozzle.position.set(0.04, 1.08, zPos);
+    g.add(nPipe, nozzle);
+  }
+  const hmiBox = makeBeveledBox(0.46, 0.36, 0.2, 0.012, M.castIron());
+  hmiBox.position.set(0.76, 1.24, 0);
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.24, 0.012), M.screen());
+  scr.position.set(0.76, 1.24, 0.102);
+  g.add(hmiBox, scr);
+
+  addPort(g, 'in', -1.06, 1.06, 0, -1, 0, 0);
+  addPort(g, 'out', 1.06, 1.06, 0, 1, 0, 0);
+  return g;
+}
+
+// =====================================================================
+// 16-19. 制造工艺线设备（统一沉稳深钢灰 + 304拉丝不锈钢 + 克制钴蓝）
+// =====================================================================
+function buildConveyorLine() {
+  const g = new THREE.Group();
+  const railH = 0.78;
+  for (const sx of [-1.05, 0, 1.05]) {
+    for (const sz of [-0.3, 0.3]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.055, railH, 0.055), M.castIron());
+      leg.position.set(sx, railH * 0.5, sz);
+      const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.02, 12), M.stainless());
+      pad.position.set(sx, 0.01, sz);
+      g.add(leg, pad);
+    }
+  }
+  for (const sz of [-0.32, 0.32]) {
+    const beam = makeBeveledBox(2.4, 0.1, 0.045, 0.008, M.steelSlate());
+    beam.position.set(0, railH, sz);
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(2.38, 0.028, 0.016), M.stainless());
+    guard.position.set(0, railH + 0.09, sz > 0 ? 0.28 : -0.28);
+    g.add(beam, guard);
+  }
+  const rollerGeo = new THREE.CylinderGeometry(0.026, 0.026, 0.58, 12);
+  const rMat = M.stainless();
+  for (let i = -10; i <= 10; i++) {
+    const roller = new THREE.Mesh(rollerGeo, rMat);
+    roller.rotation.x = Math.PI / 2;
+    roller.position.set(i * 0.105, railH + 0.036, 0);
+    g.add(roller);
+  }
+  const motor = makeIndustrialMotor({ radius: 0.085, length: 0.22, bodyMat: M.industrialBlue(), ribCount: 12 });
+  motor.position.set(0.65, railH - 0.14, 0.42);
+  g.add(motor);
+
+  addPort(g, 'in', -1.2, railH + 0.04, 0, -1, 0, 0);
+  addPort(g, 'out', 1.2, railH + 0.04, 0, 1, 0, 0);
+  return g;
+}
+
+function buildRobotStation() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(1.12, 0.1, 1.12));
+  const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.3, 0.42, 20), M.castIron());
+  pedestal.position.y = 0.31;
+  const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.2, 20), M.industrialBlue());
+  turret.position.y = 0.62;
+  const arm1 = makeBeveledBox(0.13, 0.56, 0.13, 0.014, M.stainless());
+  arm1.position.set(-0.08, 0.96, 0);
+  arm1.rotation.z = 0.32;
+  const joint = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.16, 16), M.castIron());
+  joint.rotation.x = Math.PI / 2;
+  joint.position.set(-0.18, 1.22, 0);
+  const arm2 = makeBeveledBox(0.46, 0.1, 0.1, 0.012, M.stainless());
+  arm2.position.set(0.06, 1.28, 0);
+  arm2.rotation.z = -0.25;
+  const wrist = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.068, 0.14, 14), M.industrialBlue());
+  wrist.position.set(0.29, 1.18, 0);
+  g.add(pedestal, turret, arm1, joint, arm2, wrist);
+
+  addPort(g, 'in', -0.56, 0.5, 0, -1, 0, 0);
+  addPort(g, 'out', 0.56, 0.5, 0, 1, 0, 0);
+  return g;
+}
+
+function buildLeakTestBench() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(1.56, 0.09, 0.98));
+  const frame = makeBeveledBox(1.42, 0.72, 0.84, 0.014, M.castIron());
+  frame.position.y = 0.45;
+  const top = makeBeveledBox(1.46, 0.05, 0.88, 0.008, M.stainless());
+  top.position.y = 0.83;
+  const chamber = makeBeveledBox(0.9, 0.44, 0.58, 0.012, M.stainless());
+  chamber.position.set(-0.1, 1.07, 0);
+  const windowMesh = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.32, 0.015), M.glass());
+  windowMesh.position.set(-0.1, 1.08, 0.292);
+  const ctrlBox = makeBeveledBox(0.32, 0.44, 0.46, 0.01, M.industrialBlue());
+  ctrlBox.position.set(0.52, 1.07, 0);
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.012), M.screen());
+  scr.position.set(0.52, 1.12, 0.232);
+  g.add(frame, top, chamber, windowMesh, ctrlBox, scr);
+
+  addPort(g, 'in', -0.76, 0.72, 0, -1, 0, 0);
+  addPort(g, 'out', 0.76, 0.72, 0, 1, 0, 0);
   return g;
 }
 
 function buildLaserMarker() {
   const g = new THREE.Group();
-  const base = makeBeveledBox(1.12, 0.85, 0.98, 0.02, M.darkSteel());
-  base.position.y = 0.425;
-  g.add(base);
-  const cabin = makeBeveledBox(0.94, 0.86, 0.84, 0.02, M.steelSlate());
-  cabin.position.y = 1.28;
-  g.add(cabin);
-  const safeGlass = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.44, 0.02), M.lampGreen());
-  safeGlass.position.set(0, 1.32, 0.422);
-  g.add(safeGlass);
-  const galvo = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.075, 0.26, 16), M.paintBlue());
-  galvo.position.set(0, 1.82, 0);
-  g.add(galvo);
+  g.add(makeConcretePlinth(1.24, 0.09, 1.04));
+  const cabinet = makeBeveledBox(1.1, 0.72, 0.9, 0.014, M.castIron());
+  cabinet.position.y = 0.45;
+  const enclosure = makeBeveledBox(0.92, 0.58, 0.76, 0.012, M.stainless());
+  enclosure.position.y = 1.1;
+  const frontGlass = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.4, 0.015), M.glass());
+  frontGlass.position.set(-0.08, 1.12, 0.382);
+  const laserCol = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.42, 14), M.industrialBlue());
+  laserCol.position.set(-0.08, 1.16, 0);
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.012), M.screen());
+  scr.position.set(0.32, 1.16, 0.382);
+  g.add(cabinet, enclosure, frontGlass, laserCol, scr);
+
+  addPort(g, 'in', -0.58, 0.85, 0, -1, 0, 0);
+  addPort(g, 'out', 0.58, 0.85, 0, 1, 0, 0);
   return g;
 }
 
-// 11. 可燃气体探测器（增加不锈钢防雨罩 + 数显小屏 + 格栅探头）
+// =====================================================================
+// 20-22. 报警监控与防爆（克制防爆灰/不锈钢+灯罩）
+// =====================================================================
 function buildGasDetector() {
   const g = new THREE.Group();
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.07, 18), M.steelSlate());
-  base.position.y = 0.035;
-  g.add(base);
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 1.4, 14), M.stainless());
-  pole.position.y = 0.74;
-  g.add(pole);
-  const box = makeBeveledBox(0.25, 0.28, 0.19, 0.015, M.paintAmber());
-  box.position.set(0, 1.36, 0.06);
-  g.add(box);
-  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.09, 0.01), M.screen());
-  scr.position.set(0, 1.37, 0.158);
-  g.add(scr);
-  const sensor = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.038, 0.15, 16), M.stainless());
-  sensor.position.set(0, 1.15, 0.06);
-  g.add(sensor);
-  const rainShield = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.07, 18), M.stainless());
-  rainShield.position.set(0, 1.24, 0.06);
-  g.add(rainShield);
-  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 12), M.lampAmber());
-  beacon.position.set(0, 1.54, 0.06);
-  g.add(beacon);
+  g.add(makeConcretePlinth(0.36, 0.08, 0.36));
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.032, 1.38, 14), M.stainless());
+  pole.position.y = 0.77;
+  const junctionBox = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.12, 20), M.castIron());
+  junctionBox.rotation.x = Math.PI / 2;
+  junctionBox.position.set(0, 1.48, 0);
+  const screen = new THREE.Mesh(new THREE.CylinderGeometry(0.072, 0.072, 0.126, 20), M.screen());
+  screen.rotation.x = Math.PI / 2;
+  screen.position.set(0, 1.48, 0);
+  const sensorHead = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.048, 0.15, 16), M.stainless());
+  sensorHead.position.set(0.11, 1.38, 0);
+  const beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.034, 0.08, 14), M.lampAmber());
+  beacon.position.set(0, 1.62, 0);
+  g.add(pole, junctionBox, screen, sensorHead, beacon);
+
+  addPort(g, 'in', -0.14, 1.48, 0, -1, 0, 0);
+  addPort(g, 'out', 0.14, 1.48, 0, 1, 0, 0);
   return g;
 }
 
-// 12. 防爆声光报警灯柱（加装防爆接线盒与保护格栅）
 function buildAlarmTower() {
   const g = new THREE.Group();
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.12, 18), M.hazardStripe());
-  base.position.y = 0.06;
-  g.add(base);
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.58, 16), M.darkSteel());
-  pole.position.y = 0.88;
-  g.add(pole);
-  const jbox = makeBeveledBox(0.18, 0.22, 0.14, 0.012, M.castAluminum());
-  jbox.position.set(0, 1.05, 0.08);
-  g.add(jbox);
-  const layers = [M.lampGreen(), M.lampAmber(), M.lampRed()];
-  layers.forEach((mat, i) => {
-    const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.14, 18), mat);
-    seg.position.y = 1.66 + i * 0.15;
-    g.add(seg);
-  });
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.04, 18), M.darkSteel());
-  cap.position.y = 2.05;
-  g.add(cap);
-  const horn = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.18, 18), M.stainless());
-  horn.rotation.z = Math.PI / 2;
-  horn.position.set(0.14, 2.15, 0);
-  g.add(horn);
+  g.add(makeConcretePlinth(0.42, 0.09, 0.42));
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.042, 1.56, 16), M.stainless());
+  pole.position.y = 0.87;
+  const hornBox = makeBeveledBox(0.16, 0.14, 0.12, 0.01, M.castIron());
+  hornBox.position.set(0, 1.58, 0);
+  const tierRed = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.11, 20), M.lampRed());
+  tierRed.position.y = 1.96;
+  const tierAmber = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.11, 20), M.lampAmber());
+  tierAmber.position.y = 1.84;
+  const tierGreen = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.11, 20), M.lampGreen());
+  tierGreen.position.y = 1.72;
+  g.add(pole, hornBox, tierGreen, tierAmber, tierRed);
+
+  addPort(g, 'in', 0, 0.6, 0.06, 0, 0, 1);
+  addPort(g, 'out', 0, 0.6, -0.06, 0, 0, -1);
   return g;
 }
 
 function buildExplosionPanel() {
   const g = new THREE.Group();
-  const stand = makeBeveledBox(0.68, 0.36, 0.4, 0.015, M.darkSteel());
-  stand.position.y = 0.18;
-  g.add(stand);
-  const body = makeBeveledBox(0.76, 1.08, 0.44, 0.025, M.steelSlate());
-  body.position.y = 0.9;
-  g.add(body);
-  const door = makeBeveledBox(0.64, 0.94, 0.05, 0.012, M.castAluminum());
-  door.position.set(0, 0.9, 0.22);
-  g.add(door);
-  for (const sy of [0.55, 0.9, 1.25]) {
-    for (const sx of [-0.28, 0.28]) {
-      const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.04, 6), M.stainless());
-      bolt.rotation.x = Math.PI / 2;
-      bolt.position.set(sx, sy, 0.25);
-      g.add(bolt);
+  g.add(makeConcretePlinth(0.84, 0.1, 0.54));
+  const box = makeBeveledBox(0.7, 1.15, 0.36, 0.016, M.castIron());
+  box.position.y = 0.675;
+  const doorRim = makeBeveledBox(0.62, 1.02, 0.03, 0.008, M.steelSlate());
+  doorRim.position.set(0, 0.675, 0.175);
+  const blueBand = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.08, 0.012), M.industrialBlue());
+  blueBand.position.set(0, 1.1, 0.194);
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.24, 0.012), M.screen());
+  scr.position.set(0, 0.86, 0.194);
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.01), M.nameplate());
+  plate.position.set(0, 0.36, 0.194);
+  g.add(box, doorRim, blueBand, scr, plate);
+
+  addPort(g, 'in', -0.37, 0.5, 0, -1, 0, 0);
+  addPort(g, 'out', 0.37, 0.5, 0, 1, 0, 0);
+  return g;
+}
+
+// =====================================================================
+// 23-26. 能源与配电设备全量升级：PCS / BESS / TRANSFORMER / DIST_ROOM
+// =====================================================================
+function buildPcs() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(1.64, 0.12, 1.16));
+  const body = makeBeveledBox(1.48, 1.72, 0.96, 0.016, M.steelSlate());
+  body.position.y = 0.98;
+  const roof = makeBeveledBox(1.54, 0.07, 1.04, 0.01, M.castIron());
+  roof.position.y = 1.87;
+  const headerBand = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.14, 0.015), M.industrialBlue());
+  headerBand.position.set(0, 1.66, 0.482);
+  const hmi = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.015), M.screen());
+  hmi.position.set(-0.34, 1.32, 0.482);
+  for (const lx of [0.22, 0.44]) {
+    const louver = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.64, 0.02), M.darkSteel());
+    louver.position.set(lx, 0.72, 0.482);
+    g.add(louver);
+  }
+  const nameplate = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.1, 0.012), M.nameplate());
+  nameplate.position.set(-0.34, 0.92, 0.482);
+  g.add(body, roof, headerBand, hmi, nameplate);
+
+  addPort(g, 'in', -0.78, 0.42, 0, -1, 0, 0);
+  addPort(g, 'out', 0.78, 0.42, 0, 1, 0, 0);
+  return g;
+}
+
+function buildBess() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(2.36, 0.14, 1.24));
+  const shell = makeBeveledBox(2.2, 1.82, 1.08, 0.018, M.stainless());
+  shell.position.y = 1.05;
+  const topHvac = makeBeveledBox(1.2, 0.22, 0.72, 0.014, M.castIron());
+  topHvac.position.set(-0.3, 2.07, 0);
+  const blueStripe = new THREE.Mesh(new THREE.BoxGeometry(2.16, 0.12, 0.015), M.industrialBlue());
+  blueStripe.position.set(0, 1.72, 0.542);
+  for (const dx of [-0.68, 0, 0.68]) {
+    const seam = new THREE.Mesh(new THREE.BoxGeometry(0.62, 1.38, 0.015), M.steelSlate());
+    seam.position.set(dx, 0.92, 0.542);
+    g.add(seam);
+  }
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.02), M.screen());
+  scr.position.set(0.68, 1.22, 0.552);
+  g.add(shell, topHvac, blueStripe, scr);
+
+  addPort(g, 'in', -1.14, 0.45, 0, -1, 0, 0);
+  addPort(g, 'out', 1.14, 0.45, 0, 1, 0, 0);
+  return g;
+}
+
+function buildTransformer() {
+  const g = new THREE.Group();
+  g.add(makeConcretePlinth(1.66, 0.14, 1.28));
+  const oilTank = makeBeveledBox(1.14, 1.16, 0.84, 0.018, M.castIron());
+  oilTank.position.y = 0.72;
+  // 两侧折叠散热片组
+  for (const sx of [-0.66, 0.66]) {
+    for (let i = -3; i <= 3; i++) {
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.92, 0.024), M.steelSlate());
+      fin.position.set(sx, 0.72, i * 0.11);
+      g.add(fin);
     }
   }
-  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.015), M.screen());
-  scr.position.set(0, 1.12, 0.248);
-  g.add(scr);
-  const stopBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.05, 16), M.lampRed());
-  stopBtn.rotation.x = Math.PI / 2;
-  stopBtn.position.set(0.16, 0.82, 0.26);
-  g.add(stopBtn);
-  return g;
-}
-
-function buildWaterPump() {
-  const g = new THREE.Group();
-  const skid = makeBeveledBox(1.42, 0.12, 0.68, 0.012, M.darkSteel());
-  skid.position.y = 0.06;
-  g.add(skid);
-  const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.54, 20), M.paintBlue());
-  motor.rotation.z = Math.PI / 2;
-  motor.position.set(-0.32, 0.36, 0);
-  g.add(motor);
-  for (let i = -4; i <= 4; i++) {
-    const fin = new THREE.Mesh(new THREE.CylinderGeometry(0.225, 0.225, 0.016, 20), M.paintBlue());
-    fin.rotation.z = Math.PI / 2;
-    fin.position.set(-0.32 + i * 0.048, 0.36, 0);
-    g.add(fin);
+  // 顶部储油枕
+  const conservator = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.9, 20), M.industrialBlue());
+  conservator.rotation.z = Math.PI / 2;
+  conservator.position.set(-0.08, 1.56, -0.22);
+  // 3 根高压陶瓷绝缘子套管
+  for (const bx of [-0.3, 0, 0.3]) {
+    const bush = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.052, 0.34, 16), M.stainless());
+    bush.position.set(bx, 1.47, 0.2);
+    g.add(bush);
   }
-  const motorBox = makeBeveledBox(0.14, 0.1, 0.14, 0.01, M.steelSlate());
-  motorBox.position.set(-0.32, 0.58, 0);
-  g.add(motorBox);
-  const guard = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.2, 16), M.paintAmber());
-  guard.rotation.z = Math.PI / 2;
-  guard.position.set(0.06, 0.36, 0);
-  g.add(guard);
-  const volute = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.18, 24), M.paintCyan());
-  volute.rotation.z = Math.PI / 2;
-  volute.position.set(0.32, 0.38, 0);
-  g.add(volute);
-  const inPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.24, 18), M.stainless());
-  inPipe.rotation.z = Math.PI / 2;
-  inPipe.position.set(0.52, 0.38, 0);
-  g.add(inPipe);
-  const fIn = makeFlangeAssembly(0.16, 0.09, 8);
-  fIn.position.set(0.64, 0.38, 0);
-  g.add(fIn);
-  const outPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.34, 18), M.stainless());
-  outPipe.position.set(0.32, 0.68, 0);
-  g.add(outPipe);
-  const fOut = makeFlangeAssembly(0.15, 0.085, 8);
-  fOut.rotation.z = Math.PI / 2;
-  fOut.position.set(0.32, 0.86, 0);
-  g.add(fOut);
-  addPort(g, 'in', 0.66, 0.38, 0, 1, 0, 0);
-  addPort(g, 'out', 0.32, 0.88, 0, 0, 1, 0);
+  const dial = makeDialGauge(0.062);
+  dial.position.set(0.32, 0.92, 0.43);
+  g.add(oilTank, conservator, dial);
+
+  addPort(g, 'in', -0.8, 0.6, 0, -1, 0, 0);
+  addPort(g, 'out', 0.8, 0.6, 0, 1, 0, 0);
   return g;
 }
 
-function buildDosingTank() {
+function buildDistRoom() {
   const g = new THREE.Group();
-  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 1.1, 28), M.paintGreen());
-  cyl.position.y = 0.62;
-  g.add(cyl);
-  const head = new THREE.Mesh(makeEllipticalHead(0.42, 0.18), M.paintGreen());
-  head.position.y = 1.17;
-  g.add(head);
-  const mixer = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.32, 16), M.steelSlate());
-  mixer.position.y = 1.48;
-  g.add(mixer);
-  const gauge = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.86, 12), M.glass());
-  gauge.position.set(0, 0.62, 0.44);
-  g.add(gauge);
-  addPort(g, 'in', -0.45, 0.95, 0, -1, 0, 0);
-  addPort(g, 'out', 0.45, 0.25, 0, 1, 0, 0);
+  g.add(makeConcretePlinth(3.36, 0.16, 2.16));
+  const cabin = makeBeveledBox(3.18, 2.08, 1.96, 0.02, M.steelSlate());
+  cabin.position.y = 1.2;
+  const roof = makeBeveledBox(3.28, 0.12, 2.08, 0.015, M.castIron());
+  roof.position.y = 2.3;
+  const blueBand = new THREE.Mesh(new THREE.BoxGeometry(3.16, 0.14, 0.016), M.industrialBlue());
+  blueBand.position.set(0, 2.02, 0.985);
+  for (const dx of [-0.95, 0.95]) {
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.74, 1.66, 0.025), M.castIron());
+    door.position.set(dx, 1.0, 0.985);
+    g.add(door);
+  }
+  const scr = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.28, 0.02), M.screen());
+  scr.position.set(0, 1.38, 0.988);
+  const acUnit = makeBeveledBox(0.54, 0.62, 0.26, 0.012, M.stainless());
+  acUnit.position.set(-0.2, 1.28, -1.08);
+  g.add(cabin, roof, blueBand, scr, acUnit);
+
+  addPort(g, 'in', -1.64, 0.6, 0, -1, 0, 0);
+  addPort(g, 'out', 1.64, 0.6, 0, 1, 0, 0);
   return g;
 }
 
-function buildMagMeter() {
+// =====================================================================
+// 27-31. 管件与可配置基建组件：PIPE / PIPE_ELBOW / FLANGE / FLOOR_SLAB / BASE_PAD / PLATFORM_RAIL
+// =====================================================================
+function buildPipeSegment() {
   const g = new THREE.Group();
-  const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.58, 22), M.steelSlate());
-  tube.rotation.z = Math.PI / 2;
-  tube.position.y = 0.2;
-  g.add(tube);
-  const f1 = makeFlangeAssembly(0.185, 0.11, 8);
-  f1.position.set(-0.29, 0.2, 0);
-  const f2 = makeFlangeAssembly(0.185, 0.11, 8);
-  f2.position.set(0.29, 0.2, 0);
-  g.add(f1, f2);
-  addPort(g, 'in', -0.31, 0.2, 0, -1, 0, 0);
-  addPort(g, 'out', 0.31, 0.2, 0, 1, 0, 0);
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.22, 14), M.stainless());
-  stem.position.set(0, 0.38, 0);
-  g.add(stem);
-  const head = makeBeveledBox(0.24, 0.2, 0.16, 0.015, M.paintCyan());
-  head.position.set(0, 0.55, 0);
-  g.add(head);
-  const lcd = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.1, 0.012), M.screen());
-  lcd.position.set(0, 0.55, 0.082);
-  g.add(lcd);
-  return g;
-}
-
-function buildValveHOV() {
-  const g = new THREE.Group();
-  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.62, 20), M.paintYellow());
+  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 1.0, 22), M.stainless());
   pipe.rotation.z = Math.PI / 2;
-  g.add(pipe);
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.16, 20, 16), M.paintYellow());
-  g.add(sphere);
-  const f1 = makeFlangeAssembly(0.17, 0.095, 8);
-  f1.position.x = -0.31;
-  const f2 = makeFlangeAssembly(0.17, 0.095, 8);
-  f2.position.x = 0.31;
-  g.add(f1, f2);
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.2, 14), M.stainless());
-  stem.position.y = 0.18;
-  g.add(stem);
-  const lever = makeBeveledBox(0.32, 0.035, 0.045, 0.008, M.paintRed());
-  lever.position.set(0.12, 0.28, 0);
-  g.add(lever);
-  addPort(g, 'in', -0.33, 0, 0, -1, 0, 0);
-  addPort(g, 'out', 0.33, 0, 0, 1, 0, 0);
+  pipe.position.y = 0.4;
+  const f1 = makeFlangeAssembly(0.145, 0.075, 8);
+  f1.position.set(-0.5, 0.4, 0);
+  const f2 = makeFlangeAssembly(0.145, 0.075, 8);
+  f2.position.set(0.5, 0.4, 0);
+  const support = makePipeStanchion(0, 0.4, 0, 0.075);
+  g.add(pipe, f1, f2, support);
+
+  addPort(g, 'in', -0.52, 0.4, 0, -1, 0, 0);
+  addPort(g, 'out', 0.52, 0.4, 0, 1, 0, 0);
   return g;
 }
 
-function buildValveMOV() {
+function buildPipeElbow() {
   const g = new THREE.Group();
-  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.66, 20), M.paintAmber());
-  pipe.rotation.z = Math.PI / 2;
-  g.add(pipe);
-  const body = new THREE.Mesh(new THREE.SphereGeometry(0.155, 20, 16), M.paintAmber());
-  g.add(body);
-  const f1 = makeFlangeAssembly(0.17, 0.095, 8);
-  f1.position.x = -0.33;
-  const f2 = makeFlangeAssembly(0.17, 0.095, 8);
-  f2.position.x = 0.33;
-  g.add(f1, f2);
-  const yoke = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 0.24, 14), M.stainless());
-  yoke.position.y = 0.2;
-  g.add(yoke);
-  const actuator = makeBeveledBox(0.28, 0.24, 0.22, 0.015, M.paintBlue());
-  actuator.position.y = 0.4;
-  g.add(actuator);
-  const wheel = makeHandwheel(0.12, M.paintRed());
-  wheel.rotation.z = Math.PI / 2;
-  wheel.position.set(-0.18, 0.4, 0);
-  g.add(wheel);
-  addPort(g, 'in', -0.35, 0, 0, -1, 0, 0);
-  addPort(g, 'out', 0.35, 0, 0, 1, 0, 0);
+  const rPipe = 0.075;
+  const bendR = 0.34;
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(bendR, rPipe, 18, 28, Math.PI / 2), M.stainless());
+  torus.rotation.x = Math.PI / 2;
+  torus.position.set(-0.34, 0.4, -0.34);
+  const f1 = makeFlangeAssembly(0.145, rPipe, 8);
+  f1.position.set(-0.34, 0.4, 0);
+  const f2 = makeFlangeAssembly(0.145, rPipe, 8);
+  f2.rotation.y = Math.PI / 2;
+  f2.position.set(0, 0.4, -0.34);
+  g.add(torus, f1, f2);
+
+  addPort(g, 'in', -0.36, 0.4, 0, -1, 0, 0);
+  addPort(g, 'out', 0, 0.4, -0.36, 0, 0, -1);
   return g;
 }
 
-function buildValveSSV() {
+function buildFlangePart() {
   const g = new THREE.Group();
-  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.66, 20), M.paintRed());
-  pipe.rotation.z = Math.PI / 2;
-  g.add(pipe);
-  const f1 = makeFlangeAssembly(0.17, 0.095, 8);
-  f1.position.x = -0.33;
-  const f2 = makeFlangeAssembly(0.17, 0.095, 8);
-  f2.position.x = 0.33;
-  g.add(f1, f2);
-  const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.46, 20), M.paintRed());
-  bonnet.position.y = 0.32;
-  g.add(bonnet);
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.06, 20), M.darkSteel());
-  cap.position.y = 0.56;
-  g.add(cap);
-  const switchBox = makeBeveledBox(0.16, 0.14, 0.14, 0.01, M.paintAmber());
-  switchBox.position.set(0.14, 0.4, 0);
-  g.add(switchBox);
-  addPort(g, 'in', -0.35, 0, 0, -1, 0, 0);
-  addPort(g, 'out', 0.35, 0, 0, 1, 0, 0);
+  const f = makeFlangeAssembly(0.18, 0.085, 12);
+  f.position.y = 0.4;
+  g.add(f);
+  addPort(g, 'in', -0.04, 0.4, 0, -1, 0, 0);
+  addPort(g, 'out', 0.04, 0.4, 0, 1, 0, 0);
   return g;
 }
 
-function buildValvePCV() {
+function buildSightGlass() {
   const g = new THREE.Group();
-  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.66, 20), M.paintCyan());
-  pipe.rotation.z = Math.PI / 2;
-  g.add(pipe);
-  const f1 = makeFlangeAssembly(0.17, 0.095, 8);
-  f1.position.x = -0.33;
-  const f2 = makeFlangeAssembly(0.17, 0.095, 8);
-  f2.position.x = 0.33;
-  g.add(f1, f2);
-  const diaphragm = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.1, 24), M.paintCyan());
-  diaphragm.position.y = 0.26;
-  g.add(diaphragm);
-  const springTower = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.095, 0.26, 18), M.stainless());
-  springTower.position.y = 0.44;
-  g.add(springTower);
-  const pilot = makeBeveledBox(0.12, 0.16, 0.12, 0.01, M.brass());
-  pilot.position.set(0.16, 0.38, 0.12);
-  g.add(pilot);
-  addPort(g, 'in', -0.35, 0, 0, -1, 0, 0);
-  addPort(g, 'out', 0.35, 0, 0, 1, 0, 0);
+  const yCenter = 0.4;
+  // 地面 U 型底座支架
+  g.add(makePipeStanchion(0, yCenter, 0, 0.095));
+
+  // 两端不锈钢 PN16 法兰连接颈
+  for (const sx of [-0.34, 0.34]) {
+    const fl = makeFlangeAssembly(0.165, 0.085, 8);
+    fl.position.set(sx, yCenter, 0);
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.105, 0.08, 22), M.stainless());
+    collar.rotation.z = Math.PI / 2;
+    collar.position.set(sx * 0.85, yCenter, 0);
+    g.add(fl, collar);
+  }
+
+  // 4 根防爆不锈钢保护拉杆与螺母
+  const rodMat = M.stainless();
+  const nutMat = M.darkSteel();
+  const rodGeo = new THREE.CylinderGeometry(0.011, 0.011, 0.72, 10);
+  const nutGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.024, 6);
+  for (const [ry, rz] of [
+    [0.12, 0.085],
+    [-0.12, 0.085],
+    [0.12, -0.085],
+    [-0.12, -0.085],
+  ]) {
+    const rod = new THREE.Mesh(rodGeo, rodMat);
+    rod.rotation.z = Math.PI / 2;
+    rod.position.set(0, yCenter + ry, rz);
+    g.add(rod);
+    for (const nx of [-0.36, 0.36]) {
+      const nut = new THREE.Mesh(nutGeo, nutMat);
+      nut.rotation.z = Math.PI / 2;
+      nut.position.set(nx, yCenter + ry, rz);
+      g.add(nut);
+    }
+  }
+
+  // 高透硼硅玻璃外观察腔
+  const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.098, 0.098, 0.54, 24), M.glass());
+  glass.rotation.z = Math.PI / 2;
+  glass.position.y = yCenter;
+  g.add(glass);
+
+  addPort(g, 'in', -0.36, yCenter, 0, -1, 0, 0);
+  addPort(g, 'out', 0.36, yCenter, 0, 1, 0, 0);
+  return g;
+}
+
+function buildBasePad() {
+  return makeConcretePlinth(2.4, 0.16, 1.8, [
+    [-0.95, -0.68],
+    [0.95, -0.68],
+    [-0.95, 0.68],
+    [0.95, 0.68],
+  ]);
+}
+
+function buildFloorSlab() {
+  const g = new THREE.Group();
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.016, 4.0), M.floorSlab());
+  slab.position.y = -0.008;
+  const trimMat = M.darkSteel();
+  for (const sz of [-2.015, 2.015]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(4.06, 0.02, 0.03), trimMat);
+    bar.position.set(0, -0.007, sz);
+    g.add(bar);
+  }
+  for (const sx of [-2.015, 2.015]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.02, 4.06), trimMat);
+    bar.position.set(sx, -0.007, 0);
+    g.add(bar);
+  }
+  g.add(slab);
+  return g;
+}
+
+function buildPlatformRail() {
+  const g = new THREE.Group();
+  const deckH = 0.72;
+  const deck = makeBeveledBox(2.2, 0.08, 1.3, 0.008, M.diamondPlate());
+  deck.position.y = deckH;
+  g.add(deck);
+  const legMat = M.castIron();
+  const railMat = M.stainless();
+
+  for (const sx of [-1.02, 0, 1.02]) {
+    for (const sz of [-0.58, 0.58]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, deckH, 0.06), legMat);
+      leg.position.set(sx, deckH * 0.5, sz);
+      g.add(leg);
+      if (sz > 0 && sx === 0) continue;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.02, 10), railMat);
+      post.position.set(sx, deckH + 0.51, sz);
+      g.add(post);
+    }
+  }
+  for (const ry of [deckH + 0.52, deckH + 1.0]) {
+    const backRail = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 2.08, 10), railMat);
+    backRail.rotation.z = Math.PI / 2;
+    backRail.position.set(0, ry, -0.58);
+    g.add(backRail);
+    for (const sx of [-1.02, 1.02]) {
+      const sideRail = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.18, 10), railMat);
+      sideRail.rotation.x = Math.PI / 2;
+      sideRail.position.set(sx, ry, 0);
+      g.add(sideRail);
+    }
+  }
   return g;
 }
 
@@ -1147,6 +1758,10 @@ const BUILDERS = [
   ['HENG_GUANG_SKID', 'heng-guang-skid.glb', buildHengGuangSkid],
   ['TANK', 'tank.glb', buildTank],
   ['FS', 'fs.glb', buildFilterSeparator],
+  ['WATER_PUMP', 'water-pump.glb', buildWaterPump],
+  ['HEAT_EXCHANGER', 'heat-exchanger.glb', buildHeatExchanger],
+  ['DOSING_TANK', 'dosing-tank.glb', buildDosingTank],
+  ['MAG_METER', 'mag-meter.glb', buildMagMeter],
   ['METER_MEMBRANE', 'meter-membrane.glb', buildMembraneMeter],
   ['METER_ROOTS', 'meter-roots.glb', buildRootsMeter],
   ['UF', 'uf.glb', buildUltrasonicMeter],
@@ -1158,19 +1773,29 @@ const BUILDERS = [
   ['GAS_DETECTOR', 'gas-detector.glb', buildGasDetector],
   ['ALARM_TOWER', 'alarm-tower.glb', buildAlarmTower],
   ['EXPLOSION_PANEL', 'explosion-panel.glb', buildExplosionPanel],
-  ['WATER_PUMP', 'water-pump.glb', buildWaterPump],
-  ['DOSING_TANK', 'dosing-tank.glb', buildDosingTank],
-  ['MAG_METER', 'mag-meter.glb', buildMagMeter],
   ['HOV', 'hov.glb', buildValveHOV],
   ['MOV', 'mov.glb', buildValveMOV],
   ['SSV', 'ssv.glb', buildValveSSV],
   ['PCV', 'pcv.glb', buildValvePCV],
+  ['PV', 'pv.glb', buildValvePV],
+  ['INSTR', 'instr.glb', buildInstr],
+  ['PCS', 'pcs.glb', buildPcs],
+  ['BESS', 'bess.glb', buildBess],
+  ['TRANSFORMER', 'transformer.glb', buildTransformer],
+  ['DIST_ROOM', 'dist-room.glb', buildDistRoom],
+  ['PIPE', 'pipe.glb', buildPipeSegment],
+  ['PIPE_ELBOW', 'pipe-elbow.glb', buildPipeElbow],
+  ['FLANGE', 'flange.glb', buildFlangePart],
+  ['SIGHT_GLASS', 'sight-glass.glb', buildSightGlass],
+  ['BASE_PAD', 'base-pad.glb', buildBasePad],
+  ['FLOOR_SLAB', 'floor-slab.glb', buildFloorSlab],
+  ['PLATFORM_RAIL', 'platform-rail.glb', buildPlatformRail],
 ];
 
 const exporter = new GLTFExporter();
 const manifest = {
   base: '/assets/studio',
-  version: 3,
+  version: 4,
   files: {},
 };
 
@@ -1195,4 +1820,4 @@ for (const [kind, filename, fn] of BUILDERS) {
 }
 
 writeFileSync(join(OUT_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
-console.log('Studio GLB v3 asset library generated successfully.');
+console.log(`Studio GLB v4 (${BUILDERS.length} models) generated successfully.`);

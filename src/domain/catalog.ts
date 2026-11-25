@@ -16,16 +16,10 @@ export type CatalogKind =
   | 'FLANGE'
   | 'INSTR'
   | 'TANK'
-  | 'ELEC_CB'
-  | 'ELEC_M'
-  | 'ELEC_GND'
   | 'TEXT'
-  | 'LINE_SOLID'
-  | 'LINE_DASHED'
   | 'PCS'
   | 'TRANSFORMER'
   | 'BESS'
-  | 'LOAD'
   | 'DIST_ROOM'
   | 'TURBOJET'
   | 'HENG_GUANG_SKID'
@@ -43,7 +37,10 @@ export type CatalogKind =
   | 'WATER_PUMP'
   | 'DOSING_TANK'
   | 'MAG_METER'
+  | 'HEAT_EXCHANGER'
+  | 'SIGHT_GLASS'
   | 'BASE_PAD'
+  | 'FLOOR_SLAB'
   | 'PLATFORM_RAIL';
 
 export type PortSpec = {
@@ -361,10 +358,22 @@ export const STUDIO_CATALOG: readonly StudioCatalogItem[] = [
     description: '工业给排水管道衬胶电磁流量计',
     tagPrefix: 'FE',
     defaultSection: '水务管网',
-    defaultColor: '#06b6d4',
+    defaultColor: '#1555b0',
     placeY: 0,
-    accentBg: '#0891b2',
+    accentBg: '#1555b0',
     glyph: 'FE',
+  },
+  {
+    kind: 'HEAT_EXCHANGER',
+    category: 'water',
+    labelZh: '板式换热器',
+    description: '工业钴蓝框架+波纹不锈钢板片组可拆式板换',
+    tagPrefix: 'HX',
+    defaultSection: '换热温控区',
+    defaultColor: '#1555b0',
+    placeY: 0,
+    accentBg: '#1555b0',
+    glyph: '板换',
   },
 
   // 6. 能源与特种装备
@@ -467,15 +476,39 @@ export const STUDIO_CATALOG: readonly StudioCatalogItem[] = [
     glyph: '◎',
   },
   {
+    kind: 'SIGHT_GLASS',
+    category: 'pipe-infra',
+    labelZh: '管道流动视镜',
+    description: '带护杆高透玻璃观察腔与可配置动态流体芯（支持测点联动）',
+    tagPrefix: 'SG',
+    defaultSection: '管廊管网',
+    defaultColor: '#38bdf8',
+    placeY: 0,
+    accentBg: '#0284c7',
+    glyph: '视镜',
+  },
+  {
+    kind: 'FLOOR_SLAB',
+    category: 'pipe-infra',
+    labelZh: '工业地坪组件',
+    description: '可配置材质/尺寸的厂房混凝土地坪或环氧防静电地坪块',
+    tagPrefix: 'FLR',
+    defaultSection: '土建基建',
+    defaultColor: '#374151',
+    placeY: 0,
+    accentBg: '#374151',
+    glyph: '地坪',
+  },
+  {
     kind: 'BASE_PAD',
     category: 'pipe-infra',
     labelZh: '混凝土基座',
-    description: '带黄黑安全警示边条的设备基础台',
+    description: '带倒角边缘、不锈钢地脚压板与螺栓的重工业设备基础台',
     tagPrefix: 'PAD',
     defaultSection: '土建基建',
-    defaultColor: '#64748b',
+    defaultColor: '#6b7280',
     placeY: 0,
-    accentBg: '#475569',
+    accentBg: '#4b5563',
     glyph: '基座',
   },
   {
@@ -494,12 +527,12 @@ export const STUDIO_CATALOG: readonly StudioCatalogItem[] = [
     kind: 'TEXT',
     category: 'pipe-infra',
     labelZh: '3D 工艺标牌',
-    description: '厂站区位与工段铭牌标识',
+    description: '重工业双柱立式双面工段铭牌（支持自定义文案）',
     tagPrefix: 'LBL',
     defaultSection: '标识系统',
-    defaultColor: '#0ea5e9',
-    placeY: 0.25,
-    accentBg: '#0284c7',
+    defaultColor: '#1555b0',
+    placeY: 0,
+    accentBg: '#1555b0',
     glyph: 'Aa',
   },
 ] as const;

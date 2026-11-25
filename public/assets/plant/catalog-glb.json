@@ -1,9 +1,0 @@
-{
-  "TRANSFORMER": "transformer.glb",
-  "PCS": "pcs.glb",
-  "BESS": "bess.glb",
-  "LOAD": "load.glb",
-  "DIST_ROOM": "dist-room.glb",
-  "note": "典型场景建模 — CatalogKind 含 PCS/TRANSFORMER/BESS/LOAD/DIST_ROOM；loader 为 src/scene/catalog/glbCatalog.ts → /assets/plant/",
-  "entityIdPath": "root extras.entityId"
-}

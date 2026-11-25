@@ -12,11 +12,13 @@ import {
   Sparkles,
   Unlock,
 } from 'lucide-react';
+import { getCatalogItem, type CatalogKind } from '../../domain/catalog';
 import { resolveThemeById } from '../../domain/themes';
 import { preloadAllAssets, subscribeAssets } from '../../engine/AssetManager';
 import { SceneCore, type DragFeedback } from '../../engine/SceneCore';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useProjectStore } from '../../store/useProjectStore';
+import { useTelemetryStore } from '../../store/useTelemetryStore';
 
 const SceneViewport: FC = () => {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -25,11 +27,14 @@ const SceneViewport: FC = () => {
 
   const nodes = useProjectStore((s) => s.project.nodes);
   const pipes = useProjectStore((s) => s.project.pipes);
+  const groundConfig = useProjectStore((s) => s.project.ground);
   const updateNode = useProjectStore((s) => s.updateNode);
 
   const mode = useEditorStore((s) => s.mode);
   const tool = useEditorStore((s) => s.tool);
   const selectedNodeId = useEditorStore((s) => s.selectedNodeId);
+  const selectedPipeId = useEditorStore((s) => s.selectedPipeId);
+  const valueMap = useTelemetryStore((s) => s.valueMap);
   const snapEnabled = useEditorStore((s) => s.snapEnabled);
   const snapStep = useEditorStore((s) => s.snapStep);
   const canvasLocked = useEditorStore((s) => s.canvasLocked);
@@ -106,9 +111,12 @@ const SceneViewport: FC = () => {
       },
     });
     coreRef.current = core;
+    core.applyGroundConfig(useProjectStore.getState().project.ground);
+    core.setTelemetryMap(useTelemetryStore.getState().valueMap);
     core.syncNodes(useProjectStore.getState().project.nodes);
     core.syncPipes(useProjectStore.getState().project.pipes);
     core.setSelectedNode(useEditorStore.getState().selectedNodeId);
+    core.setSelectedPipe(useEditorStore.getState().selectedPipeId);
 
     const unsubAssets = subscribeAssets(() => {
       core.syncNodes(useProjectStore.getState().project.nodes);
@@ -130,12 +138,13 @@ const SceneViewport: FC = () => {
     window.addEventListener('studio:capture-bookmark', onCaptureBookmark);
 
     const onCustomDrop = (e: Event) => {
-      const ce = e as CustomEvent<{ kind: Parameters<SceneCore['projectClientToGround']>[2] extends never ? never : string; clientX: number; clientY: number }>;
+      const ce = e as CustomEvent<{ kind: CatalogKind; clientX: number; clientY: number }>;
       const detail = ce.detail;
       core.clearDragGhost();
       if (!detail || useEditorStore.getState().canvasLocked) return;
-      const itemKind = detail.kind as Parameters<typeof useProjectStore.getState> extends never ? never : any;
-      const pos = core.projectClientToGround(detail.clientX, detail.clientY, 0);
+      const itemKind = detail.kind;
+      const placeY = getCatalogItem(itemKind)?.placeY ?? 0;
+      const pos = core.projectClientToGround(detail.clientX, detail.clientY, placeY);
       if (!pos) return;
       const created = useProjectStore.getState().addNodeFromCatalog(itemKind, pos);
       setSelectedNodeId(created.id);
@@ -159,6 +168,18 @@ const SceneViewport: FC = () => {
   useEffect(() => {
     coreRef.current?.syncPipes(pipes);
   }, [pipes]);
+
+  useEffect(() => {
+    coreRef.current?.applyGroundConfig(groundConfig);
+  }, [groundConfig]);
+
+  useEffect(() => {
+    coreRef.current?.setSelectedPipe(selectedPipeId);
+  }, [selectedPipeId]);
+
+  useEffect(() => {
+    coreRef.current?.setTelemetryMap(valueMap);
+  }, [valueMap]);
 
   useEffect(() => {
     coreRef.current?.setInteractive(mode === 'studio');

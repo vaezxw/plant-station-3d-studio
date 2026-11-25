@@ -25,6 +25,57 @@ export type DashboardWidgetConfig = {
 
 export type Vec3 = [number, number, number];
 
+export type GroundStyle =
+  | 'weathered-concrete'
+  | 'epoxy-dark'
+  | 'slate-matte'
+  | 'steel-grid-floor'
+  | 'grid-only';
+
+export type GroundConfig = {
+  enabled: boolean;
+  style: GroundStyle;
+  shape: 'rect' | 'circle';
+  width: number;
+  depth: number;
+  roughness: number;
+  metalness: number;
+  showBorder: boolean;
+};
+
+export function createDefaultGroundConfig(): GroundConfig {
+  return {
+    enabled: true,
+    style: 'weathered-concrete',
+    shape: 'rect',
+    width: 32,
+    depth: 24,
+    roughness: 0.48,
+    metalness: 0.14,
+    showBorder: true,
+  };
+}
+
+export type PipeFlowMode = 'uv-chevron' | 'glass-stream' | '3d-arrow' | 'none';
+
+export type PipeFlowConfig = {
+  enabled: boolean;
+  mode: PipeFlowMode;
+  direction: 'forward' | 'reverse';
+  speed: number;
+  color?: string;
+  bindPointId?: string;
+};
+
+export function createDefaultPipeFlow(): PipeFlowConfig {
+  return {
+    enabled: true,
+    mode: 'uv-chevron',
+    direction: 'forward',
+    speed: 1.0,
+  };
+}
+
 export type SceneNode = {
   id: string;
   tag: string;
@@ -36,6 +87,8 @@ export type SceneNode = {
   rotation: Vec3;
   scale: Vec3;
   color?: string;
+  floorStyle?: GroundStyle;
+  pipeFlow?: PipeFlowConfig;
   visible: boolean;
   locked: boolean;
   pointIds: string[];
@@ -50,6 +103,7 @@ export type PipeEdge = {
   toPort: string;
   medium: 'gas' | 'water' | 'air';
   diameterMm: number;
+  flow?: PipeFlowConfig;
 };
 
 export type CameraBookmark = {
@@ -68,6 +122,7 @@ export type ProjectSchema = {
   themeId: string;
   dashboardTemplate: DashboardTemplateId;
   dashboardWidgets?: DashboardWidgetConfig[];
+  ground?: GroundConfig;
   nodes: SceneNode[];
   pipes: PipeEdge[];
   bookmarks: CameraBookmark[];

@@ -1,10 +1,14 @@
 {
   "base": "/assets/studio",
-  "version": 3,
+  "version": 4,
   "files": {
     "HENG_GUANG_SKID": "heng-guang-skid.glb",
     "TANK": "tank.glb",
     "FS": "fs.glb",
+    "WATER_PUMP": "water-pump.glb",
+    "HEAT_EXCHANGER": "heat-exchanger.glb",
+    "DOSING_TANK": "dosing-tank.glb",
+    "MAG_METER": "mag-meter.glb",
     "METER_MEMBRANE": "meter-membrane.glb",
     "METER_ROOTS": "meter-roots.glb",
     "UF": "uf.glb",
@@ -16,12 +20,22 @@
     "GAS_DETECTOR": "gas-detector.glb",
     "ALARM_TOWER": "alarm-tower.glb",
     "EXPLOSION_PANEL": "explosion-panel.glb",
-    "WATER_PUMP": "water-pump.glb",
-    "DOSING_TANK": "dosing-tank.glb",
-    "MAG_METER": "mag-meter.glb",
     "HOV": "hov.glb",
     "MOV": "mov.glb",
     "SSV": "ssv.glb",
-    "PCV": "pcv.glb"
+    "PCV": "pcv.glb",
+    "PV": "pv.glb",
+    "INSTR": "instr.glb",
+    "PCS": "pcs.glb",
+    "BESS": "bess.glb",
+    "TRANSFORMER": "transformer.glb",
+    "DIST_ROOM": "dist-room.glb",
+    "PIPE": "pipe.glb",
+    "PIPE_ELBOW": "pipe-elbow.glb",
+    "FLANGE": "flange.glb",
+    "SIGHT_GLASS": "sight-glass.glb",
+    "BASE_PAD": "base-pad.glb",
+    "FLOOR_SLAB": "floor-slab.glb",
+    "PLATFORM_RAIL": "platform-rail.glb"
   }
 }

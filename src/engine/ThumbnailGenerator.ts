@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { CatalogKind } from '../domain/catalog';
 import { disposeAssetObject, instantiateAssetObject, subscribeAssets } from './AssetManager';
+import { createIndustrialEnvTexture } from './MaterialLibrary';
 
 export const THUMB_WIDTH = 160;
 export const THUMB_HEIGHT = 112;
@@ -41,18 +41,18 @@ class ThumbnailHub {
     this.renderer.toneMappingExposure = 1.1;
 
     this.pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.envRT = this.pmrem.fromScene(new RoomEnvironment(), 0.04);
+    this.envRT = createIndustrialEnvTexture(this.renderer, this.pmrem);
 
     this.scene = new THREE.Scene();
     this.scene.environment = this.envRT.texture;
-    this.scene.environmentIntensity = 0.95;
+    this.scene.environmentIntensity = 1.15;
 
-    this.scene.add(new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.65));
-    const key = new THREE.DirectionalLight(0xfff7ed, 1.7);
-    key.position.set(2.5, 4.0, 2.8);
+    this.scene.add(new THREE.HemisphereLight(0xdbeafe, 0x162030, 0.55));
+    const key = new THREE.DirectionalLight(0xf8fafc, 2.0);
+    key.position.set(2.8, 4.4, 3.0);
     this.scene.add(key);
-    const rim = new THREE.DirectionalLight(0x60a5fa, 0.65);
-    rim.position.set(-2.5, 1.5, -2.0);
+    const rim = new THREE.DirectionalLight(0x38bdf8, 0.9);
+    rim.position.set(-2.6, 1.8, -2.2);
     this.scene.add(rim);
 
     this.camera = new THREE.PerspectiveCamera(34, THUMB_WIDTH / THUMB_HEIGHT, 0.05, 60);
