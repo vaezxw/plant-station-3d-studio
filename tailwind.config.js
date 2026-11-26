@@ -23,6 +23,7 @@ export default {
           DEFAULT: 'var(--accent)',
           soft: 'var(--accent-soft)',
           glow: 'var(--accent-glow)',
+          fg: 'var(--accent-fg)',
         },
       },
       fontFamily: {

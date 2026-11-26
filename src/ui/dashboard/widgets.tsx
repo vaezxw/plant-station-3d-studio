@@ -1,9 +1,20 @@
 import type { FC } from 'react';
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Activity, AlertTriangle, BarChart3, CheckCircle2, Cpu, Gauge } from 'lucide-react';
-import type { DashboardWidgetType } from '../../domain/schema';
+import type { CardElementSchema, DashboardWidgetConfig } from '../../domain/schema';
+import { BUILTIN_CARD_TEMPLATES, useCardTemplateStore } from '../../store/useCardTemplateStore';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useProjectStore } from '../../store/useProjectStore';
 import { POINT_CATALOG, useTelemetryStore } from '../../store/useTelemetryStore';
+import { SortableElementItem } from './ElementRenderer';
 
 function buildLinePath(values: number[], width: number, height: number, pad = 6): string {
   if (values.length < 2) return '';
@@ -21,18 +32,92 @@ function buildLinePath(values: number[], width: number, height: number, pad = 6)
     .join(' ');
 }
 
-export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
+export const CustomElementsBody: FC<{
+  widgetId: string;
+  elements: CardElementSchema[];
+  sceneBinding?: DashboardWidgetConfig['sceneBinding'];
+  isEditing: boolean;
+}> = ({ widgetId, elements, sceneBinding, isEditing }) => {
+  const selectedWidgetId = useEditorStore((s) => s.selectedWidgetId);
+  const selectedElementId = useEditorStore((s) => s.selectedElementId);
+  const setSelectedElementId = useEditorStore((s) => s.setSelectedElementId);
+  const reorderCardElements = useProjectStore((s) => s.reorderCardElements);
+  const removeCardElement = useProjectStore((s) => s.removeCardElement);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+
+  const handleDragEnd = (ev: DragEndEvent) => {
+    const { active, over } = ev;
+    if (!over || active.id === over.id) return;
+    const ids = elements.map((e) => e.id);
+    const oldIndex = ids.indexOf(String(active.id));
+    const newIndex = ids.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+    const next = [...ids];
+    const [moved] = next.splice(oldIndex, 1);
+    next.splice(newIndex, 0, moved);
+    reorderCardElements(widgetId, next);
+  };
+
+  if (elements.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center text-center text-[11px] text-text-muted border border-dashed border-border-subtle rounded-lg p-3">
+        从左侧物料栏拖拽或点击原子元素添加到此卡片
+      </div>
+    );
+  }
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={elements.map((e) => e.id)} strategy={rectSortingStrategy}>
+        <div className="grid grid-cols-12 gap-2 content-start">
+          {elements.map((el) => (
+            <SortableElementItem
+              key={el.id}
+              widgetId={widgetId}
+              element={el}
+              sceneBinding={sceneBinding}
+              isEditing={isEditing}
+              isSelected={selectedWidgetId === widgetId && selectedElementId === el.id}
+              onSelect={() => setSelectedElementId(widgetId, el.id)}
+              onRemove={() => removeCardElement(widgetId, el.id)}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
+  );
+};
+
+export const WidgetRenderer: FC<{
+  widget: DashboardWidgetConfig;
+  isEditing?: boolean;
+}> = ({ widget, isEditing = false }) => {
   const project = useProjectStore((s) => s.project);
   const selectedNodeId = useEditorStore((s) => s.selectedNodeId);
   const setSelectedNodeId = useEditorStore((s) => s.setSelectedNodeId);
   const triggerCameraView = useEditorStore((s) => s.triggerCameraView);
+  const customTemplates = useCardTemplateStore((s) => s.customTemplates);
 
   const valueMap = useTelemetryStore((s) => s.valueMap);
   const history = useTelemetryStore((s) => s.history);
   const alarms = useTelemetryStore((s) => s.alarms);
   const meterStats = useTelemetryStore((s) => s.meterStats);
 
-  if (type === 'kpi') {
+  if (widget.type === 'custom') {
+    return (
+      <CustomElementsBody
+        widgetId={widget.id}
+        elements={widget.elements ?? []}
+        sceneBinding={widget.sceneBinding}
+        isEditing={isEditing}
+      />
+    );
+  }
+
+  if (widget.type === 'kpi') {
     const p1 = valueMap['HG-UF-101.pressure']?.value ?? 4676.98;
     const t1 = valueMap['HG-UF-101.temperature']?.value ?? 39.55;
     const f1 = valueMap['HG-UF-101.flowWork']?.value ?? 124.5;
@@ -69,7 +154,7 @@ export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
     );
   }
 
-  if (type === 'trend') {
+  if (widget.type === 'trend') {
     const pressures = history.map((h) => h.pressure);
     const flows = history.map((h) => h.flow);
     const pPath = buildLinePath(pressures, 280, 96);
@@ -99,7 +184,7 @@ export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
     );
   }
 
-  if (type === 'alarms') {
+  if (widget.type === 'alarms') {
     return (
       <div className="space-y-2 overflow-y-auto h-full pr-0.5">
         {alarms.map((a) => (
@@ -128,7 +213,7 @@ export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
     );
   }
 
-  if (type === 'production') {
+  if (widget.type === 'production') {
     return (
       <div className="space-y-2.5 h-full flex flex-col justify-between">
         <div className="grid grid-cols-2 gap-2">
@@ -163,7 +248,7 @@ export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
     );
   }
 
-  if (type === 'section-stats') {
+  if (widget.type === 'section-stats') {
     const counts = new Map<string, number>();
     for (const n of project.nodes) {
       counts.set(n.section, (counts.get(n.section) ?? 0) + 1);
@@ -192,13 +277,38 @@ export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
     );
   }
 
-  // detail 选中设备详情
+  // detail 选中设备详情：优先按设备专属模板或模型类型映射模板渲染，未匹配时走标准详情视图
   const selectedNode = project.nodes.find((n) => n.id === selectedNodeId);
   if (!selectedNode) {
     return (
       <div className="text-xs text-text-muted leading-relaxed py-6 text-center flex flex-col items-center gap-2">
         <Cpu className="w-6 h-6 text-accent/60" />
-        <span>点击 3D 场景中的任意设备或位号标牌，即可在此联动查看实时测点与工段详情。</span>
+        <span>点击 3D 场景中的任意设备或位号标牌，即可在此联动查看专属组件模板或实时测点详情。</span>
+      </div>
+    );
+  }
+
+  const allTemplates = [...BUILTIN_CARD_TEMPLATES, ...customTemplates];
+  const matchedTplId =
+    selectedNode.detailTemplateId ??
+    (selectedNode.kind !== 'CUSTOM_GLB' ? project.kindTemplateMap?.[selectedNode.kind] : undefined);
+  const matchedTpl =
+    allTemplates.find((t) => t.id === matchedTplId) ??
+    allTemplates.find((t) => t.bindCatalogKind === selectedNode.kind);
+
+  if (matchedTpl) {
+    return (
+      <div className="space-y-2 overflow-y-auto h-full">
+        <div className="flex items-center justify-between text-[10px] font-mono text-accent/90 px-0.5">
+          <span>关联模板：{matchedTpl.name}</span>
+          <span>{selectedNode.tag}</span>
+        </div>
+        <CustomElementsBody
+          widgetId={widget.id}
+          elements={matchedTpl.elements}
+          sceneBinding={{ targetNodeId: selectedNode.id, followSelectedNode: true }}
+          isEditing={false}
+        />
       </div>
     );
   }
@@ -213,26 +323,32 @@ export const WidgetRenderer: FC<{ type: DashboardWidgetType }> = ({ type }) => {
         </div>
       </div>
 
-      {selectedNode.pointIds.length === 0 ? (
+      {selectedNode.pointIds.length === 0 && (selectedNode.customPoints?.length ?? 0) === 0 ? (
         <div className="text-[11px] text-text-muted">
-          该设备暂未绑定测点（可在「3D 搭建 → 属性检查器」中绑定）。
+          该设备暂未绑定测点（可在「3D 搭建 → 属性检查器」中绑定或填写外部点号）。
         </div>
       ) : (
         <div className="space-y-1.5">
-          {selectedNode.pointIds.map((pid) => {
-            const def = POINT_CATALOG.find((p) => p.id === pid);
-            const pv = valueMap[pid];
+          {[
+            ...selectedNode.pointIds.map((pid) => ({
+              key: pid,
+              label: POINT_CATALOG.find((p) => p.id === pid)?.name ?? pid,
+              unit: POINT_CATALOG.find((p) => p.id === pid)?.unit ?? '',
+            })),
+            ...(selectedNode.customPoints ?? []),
+          ].map((item) => {
+            const pv = valueMap[item.key];
             return (
               <div
-                key={pid}
+                key={item.key}
                 className="px-2.5 py-1.5 rounded-lg bg-bg-canvas/65 border border-border-subtle flex items-center justify-between text-xs"
               >
-                <span className="text-text-secondary flex items-center gap-1">
-                  <Activity className="w-3 h-3 text-accent" />
-                  {def?.name ?? pid}
+                <span className="text-text-secondary flex items-center gap-1 truncate">
+                  <Activity className="w-3 h-3 text-accent shrink-0" />
+                  <span className="truncate">{item.label}</span>
                 </span>
-                <span className="font-mono font-semibold text-text-primary">
-                  {pv?.value ?? '--'} {def?.unit ?? ''}
+                <span className="font-mono font-semibold text-text-primary shrink-0">
+                  {pv?.value ?? '--'} {item.unit ?? ''}
                 </span>
               </div>
             );

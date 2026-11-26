@@ -87,7 +87,7 @@ const ThemeCustomizerModal: FC = () => {
                     className={`p-2.5 rounded-lg border flex items-center justify-between gap-2 cursor-pointer transition ${
                       active
                         ? 'border-border-strong bg-accent-soft'
-                        : 'border-border-subtle bg-bg-canvas/60 hover:bg-bg-hover'
+                        : 'border-border-subtle bg-bg-canvas hover:bg-bg-hover'
                     }`}
                     onClick={() => setThemeId(t.id)}
                   >

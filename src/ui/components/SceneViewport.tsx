@@ -15,6 +15,7 @@ import {
 import { getCatalogItem, type CatalogKind } from '../../domain/catalog';
 import { resolveThemeById } from '../../domain/themes';
 import { preloadAllAssets, subscribeAssets } from '../../engine/AssetManager';
+import { emitBridgeNodeClick } from '../../engine/ScadaBridge';
 import { SceneCore, type DragFeedback } from '../../engine/SceneCore';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useProjectStore } from '../../store/useProjectStore';
@@ -43,6 +44,8 @@ const SceneViewport: FC = () => {
   const themeId = useEditorStore((s) => s.themeId);
   const customThemes = useEditorStore((s) => s.customThemes);
   const cameraCommand = useEditorStore((s) => s.cameraCommand);
+  const sceneActionCommand = useEditorStore((s) => s.sceneActionCommand);
+  const dashboardSceneLock = useEditorStore((s) => s.dashboardSceneLock);
   const draggingCatalogKind = useEditorStore((s) => s.draggingCatalogKind);
   const turbojetUi = useEditorStore((s) => s.turbojetUi);
 
@@ -74,6 +77,9 @@ const SceneViewport: FC = () => {
           return;
         }
         const node = useProjectStore.getState().project.nodes.find((n) => n.id === nodeId);
+        if (node) {
+          emitBridgeNodeClick(node, partLabel);
+        }
         if (node?.kind === 'TURBOJET') {
           const rig = core.getTurbojetRig(nodeId);
           const st = rig?.getState();
@@ -111,6 +117,9 @@ const SceneViewport: FC = () => {
       },
     });
     coreRef.current = core;
+    (
+      window as unknown as { __plantStudioCaptureThumbnail?: () => string | undefined }
+    ).__plantStudioCaptureThumbnail = () => core.captureThumbnailDataUrl(480);
     core.applyGroundConfig(useProjectStore.getState().project.ground);
     core.setTelemetryMap(useTelemetryStore.getState().valueMap);
     core.syncNodes(useProjectStore.getState().project.nodes);
@@ -152,6 +161,9 @@ const SceneViewport: FC = () => {
     window.addEventListener('studio:drop-catalog', onCustomDrop);
 
     return () => {
+      delete (
+        window as unknown as { __plantStudioCaptureThumbnail?: () => string | undefined }
+      ).__plantStudioCaptureThumbnail;
       window.removeEventListener('studio:capture-bookmark', onCaptureBookmark);
       window.removeEventListener('studio:export-glb', onExportGlb);
       window.removeEventListener('studio:drop-catalog', onCustomDrop);
@@ -180,6 +192,36 @@ const SceneViewport: FC = () => {
   useEffect(() => {
     coreRef.current?.setTelemetryMap(valueMap);
   }, [valueMap]);
+
+  useEffect(() => {
+    coreRef.current?.setOrbitLocked(mode === 'dashboard' && dashboardSceneLock);
+  }, [mode, dashboardSceneLock]);
+
+  useEffect(() => {
+    if (!sceneActionCommand || !coreRef.current) return;
+    const act = sceneActionCommand.action;
+    if (act.type === 'focus-node') {
+      setSelectedNodeId(act.nodeId);
+      coreRef.current.setSelectedNode(act.nodeId);
+      coreRef.current.applyCameraPreset('focus');
+    } else if (act.type === 'fly-bookmark') {
+      const bm = useProjectStore.getState().project.bookmarks.find((b) => b.id === act.bookmarkId);
+      if (bm) coreRef.current.flyTo(bm.position, bm.target);
+    } else if (act.type === 'highlight-section') {
+      coreRef.current.highlightSection(act.section);
+    } else if (act.type === 'highlight-pipe') {
+      setSelectedPipeId(act.pipeId);
+    } else if (act.type === 'toggle-turbojet') {
+      const rig = coreRef.current.getTurbojetRig(act.nodeId);
+      if (rig) {
+        const st = rig.getState();
+        if (act.mode === 'spin') rig.setSpin(!st.spin);
+        else if (act.mode === 'explode') rig.setExplode(!st.explode);
+        else if (act.mode === 'cutaway') rig.setCutaway(!st.cutaway);
+        setSelectedNodeId(act.nodeId);
+      }
+    }
+  }, [sceneActionCommand, setSelectedNodeId, setSelectedPipeId]);
 
   useEffect(() => {
     coreRef.current?.setInteractive(mode === 'studio');

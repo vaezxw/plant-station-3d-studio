@@ -4,7 +4,7 @@ import { PROJECT_PRESETS } from '../../domain/presets';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useProjectStore } from '../../store/useProjectStore';
 
-const TemplatesView: FC = () => {
+const TemplatesView: FC<{ onEnterEditor?: () => void }> = ({ onEnterEditor }) => {
   const savedProjects = useProjectStore((s) => s.savedProjects);
   const loadPreset = useProjectStore((s) => s.loadPreset);
   const loadFromLibrary = useProjectStore((s) => s.loadFromLibrary);
@@ -20,6 +20,7 @@ const TemplatesView: FC = () => {
     setThemeId(themeId);
     setSelectedNodeId(null);
     setMode(targetMode);
+    onEnterEditor?.();
     setTimeout(() => triggerCameraView('iso'), 60);
   };
 
@@ -35,10 +36,13 @@ const TemplatesView: FC = () => {
           </div>
           <button
             type="button"
-            onClick={() => setMode('studio')}
+            onClick={() => {
+              setMode('studio');
+              onEnterEditor?.();
+            }}
             className="px-3.5 py-1.5 rounded-md bg-accent text-slate-950 text-xs font-semibold flex items-center gap-1.5 hover:opacity-90"
           >
-            返回当前工作台 <ArrowRight className="w-3.5 h-3.5" />
+            {onEnterEditor ? '进入 3D 工作台' : '返回当前工作台'} <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -120,6 +124,7 @@ const TemplatesView: FC = () => {
                         void loadFromLibrary(item.id).then(() => {
                           setSelectedNodeId(null);
                           setMode('studio');
+                          onEnterEditor?.();
                         });
                       }}
                       className="px-2.5 py-1.5 rounded bg-accent-soft text-accent text-xs font-medium flex items-center gap-1 hover:bg-accent hover:text-slate-950 transition"

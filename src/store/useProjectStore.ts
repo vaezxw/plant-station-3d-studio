@@ -2,12 +2,18 @@ import { del, get, keys, set } from 'idb-keyval';
 import { create } from 'zustand';
 import { getCatalogItem, type CatalogKind } from '../domain/catalog';
 import { PROJECT_PRESETS } from '../domain/presets';
+import { captureProjectCompositeSnapshot } from '../engine/CompositeThumbnail';
 import {
+  createDefaultDataSources,
   createDefaultGroundConfig,
   createDefaultPipeFlow,
   createWidgetsForTemplate,
+  normalizeWidgetsTo24Cols,
+  type CardElementSchema,
+  type CardTemplateSchema,
   type DashboardTemplateId,
   type DashboardWidgetConfig,
+  type DataSourceConfig,
   type GroundConfig,
   type PipeEdge,
   type ProjectSchema,
@@ -24,6 +30,10 @@ export type SavedProjectSummary = {
   name: string;
   industry: ProjectSchema['industry'];
   nodeCount: number;
+  widgetCount: number;
+  stationCode?: string;
+  publishedSceneId?: string;
+  thumbnailDataUrl?: string;
   updatedAt: number;
 };
 
@@ -42,7 +52,16 @@ type ProjectState = {
 
   loadPreset: (presetId: string) => void;
   importProject: (schema: ProjectSchema) => void;
-  updateProjectMeta: (patch: Partial<Pick<ProjectSchema, 'name' | 'description' | 'themeId' | 'dashboardTemplate'>>) => void;
+  /** 以只读运行态加载（例如独立预览链接加载已发布大屏），不覆盖用户工作台草稿缓存 */
+  loadRuntimeProject: (schema: ProjectSchema) => void;
+  updateProjectMeta: (
+    patch: Partial<
+      Pick<
+        ProjectSchema,
+        'name' | 'description' | 'themeId' | 'dashboardTemplate' | 'publishedSceneId' | 'stationCode' | 'thumbnailDataUrl'
+      >
+    >,
+  ) => void;
   updateGroundConfig: (patch: Partial<GroundConfig>, recordHistory?: boolean) => void;
 
   addNodeFromCatalog: (kind: CatalogKind, position: Vec3) => SceneNode;
@@ -55,6 +74,39 @@ type ProjectState = {
   removePipe: (id: string) => void;
   setDashboardTemplate: (tpl: DashboardTemplateId) => void;
   setDashboardWidgets: (widgets: DashboardWidgetConfig[]) => void;
+  addCustomCardWidget: (
+    title: string,
+    elements: CardElementSchema[],
+    opts?: {
+      w?: number;
+      h?: number;
+      cardStyle?: DashboardWidgetConfig['cardStyle'];
+      sceneBinding?: DashboardWidgetConfig['sceneBinding'];
+    },
+  ) => DashboardWidgetConfig;
+  addWidgetFromTemplate: (
+    tpl: CardTemplateSchema,
+    targetNodeId?: string,
+  ) => DashboardWidgetConfig;
+  updateDashboardWidget: (
+    id: string,
+    patch: Partial<DashboardWidgetConfig>,
+    recordHistory?: boolean,
+  ) => void;
+  duplicateDashboardWidget: (id: string) => DashboardWidgetConfig | null;
+  removeDashboardWidget: (id: string) => void;
+  addCardElement: (widgetId: string, element: CardElementSchema) => void;
+  updateCardElement: (
+    widgetId: string,
+    elementId: string,
+    patch: Partial<CardElementSchema>,
+    recordHistory?: boolean,
+  ) => void;
+  reorderCardElements: (widgetId: string, orderedIds: string[]) => void;
+  removeCardElement: (widgetId: string, elementId: string) => void;
+  upsertDataSource: (ds: DataSourceConfig) => void;
+  removeDataSource: (id: string) => void;
+  setKindTemplateMapping: (kind: CatalogKind, templateId: string | undefined) => void;
   addBookmark: (name: string, position: Vec3, target: Vec3) => void;
   removeBookmark: (id: string) => void;
 
@@ -81,6 +133,17 @@ function persistActive(project: ProjectSchema) {
   void set(ACTIVE_PROJECT_IDB_KEY, project);
 }
 
+function getNormalizedWidgets(p: ProjectSchema): DashboardWidgetConfig[] {
+  return normalizeWidgetsTo24Cols(
+    p.dashboardWidgets ?? createWidgetsForTemplate(p.dashboardTemplate),
+  );
+}
+
+function nextCardPlacementY(widgets: DashboardWidgetConfig[]): number {
+  const occupiedMiddle = widgets.some((w) => w.visible && w.x < 16 && w.x + w.w > 7 && w.y < 10);
+  return occupiedMiddle ? 10 : 1;
+}
+
 export const useProjectStore = create<ProjectState>((setState, getState) => ({
   project: PROJECT_PRESETS[0].create(),
   past: [],
@@ -89,6 +152,10 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
   hydrated: false,
 
   hydrateFromStorage: async () => {
+    if (getState().hydrated) {
+      await getState().refreshLibrary();
+      return;
+    }
     try {
       const stored = await get<ProjectSchema>(ACTIVE_PROJECT_IDB_KEY);
       if (stored && stored.version === 2 && Array.isArray(stored.nodes)) {
@@ -117,6 +184,10 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
             name: proj.name,
             industry: proj.industry,
             nodeCount: proj.nodes.length,
+            widgetCount: (proj.dashboardWidgets ?? []).filter((w) => w.visible).length,
+            stationCode: proj.stationCode,
+            publishedSceneId: proj.publishedSceneId,
+            thumbnailDataUrl: proj.thumbnailDataUrl,
             updatedAt: proj.updatedAt,
           });
         }
@@ -134,6 +205,8 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
     if (!cur.id || cur.id.startsWith('preset-')) {
       cur.id = `proj-${Date.now()}`;
     }
+    const shot = await captureProjectCompositeSnapshot(cur);
+    if (shot) cur.thumbnailDataUrl = shot;
     await set(`${LIBRARY_PREFIX}${cur.id}`, cur);
     await set(ACTIVE_PROJECT_IDB_KEY, cur);
     setState({ project: cur });
@@ -171,6 +244,12 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
     const past = [...getState().past, prev].slice(-MAX_HISTORY);
     persistActive(next);
     setState({ project: next, past, future: [] });
+  },
+
+  loadRuntimeProject: (schema) => {
+    if (!schema || !Array.isArray(schema.nodes)) return;
+    const next: ProjectSchema = { ...cloneProject(schema), version: 2 };
+    setState({ project: next, past: [], future: [] });
   },
 
   updateProjectMeta: (patch) => {
@@ -360,6 +439,220 @@ export const useProjectStore = create<ProjectState>((setState, getState) => ({
     const next = { ...cur, dashboardWidgets, updatedAt: Date.now() };
     persistActive(next);
     setState({ project: next });
+  },
+
+  addCustomCardWidget: (title, elements, opts) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    const w = Math.max(7, opts?.w ?? 9);
+    const h = Math.max(7, opts?.h ?? 8);
+    const created: DashboardWidgetConfig = {
+      id: `w-custom-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      type: 'custom',
+      title: title.trim() || '新建监视卡片',
+      showHeader: true,
+      x: 7,
+      y: nextCardPlacementY(widgets),
+      w,
+      h,
+      gridCols: 24,
+      visible: true,
+      cardStyle: opts?.cardStyle,
+      elements,
+      sceneBinding: opts?.sceneBinding,
+    };
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dashboardWidgets: [...widgets, created], updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+    return created;
+  },
+
+  addWidgetFromTemplate: (tpl, targetNodeId) => {
+    const clonedElements = (
+      JSON.parse(JSON.stringify(tpl.elements)) as CardElementSchema[]
+    ).map((el, i) => ({
+      ...el,
+      id: `el-${Date.now().toString(36)}-${i}-${Math.random().toString(36).slice(2, 5)}`,
+    }));
+    const targetNode = targetNodeId
+      ? getState().project.nodes.find((n) => n.id === targetNodeId)
+      : undefined;
+    return getState().addCustomCardWidget(
+      targetNode ? `${targetNode.tag} · ${tpl.name}` : tpl.name,
+      clonedElements,
+      {
+        w: tpl.defaultSize.w,
+        h: tpl.defaultSize.h,
+        cardStyle: tpl.cardStyle,
+        sceneBinding: {
+          targetNodeId: targetNode?.id,
+          targetCatalogKind: tpl.bindCatalogKind,
+          followSelectedNode: !targetNode && !tpl.bindCatalogKind ? false : !targetNode,
+        },
+      },
+    );
+  },
+
+  updateDashboardWidget: (id, patch, recordHistory = true) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    if (!widgets.some((w) => w.id === id)) return;
+    const nextWidgets = widgets.map((w) => (w.id === id ? { ...w, ...patch } : w));
+    const next = { ...cur, dashboardWidgets: nextWidgets, updatedAt: Date.now() };
+    persistActive(next);
+    if (recordHistory) {
+      const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+      setState({ project: next, past, future: [] });
+    } else {
+      setState({ project: next });
+    }
+  },
+
+  duplicateDashboardWidget: (id) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    const src = widgets.find((w) => w.id === id);
+    if (!src) return null;
+    const copy = JSON.parse(JSON.stringify(src)) as DashboardWidgetConfig;
+    copy.id = `w-copy-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
+    copy.title = `${src.title} 副本`;
+    copy.x = Math.min(24 - copy.w, src.x + 1);
+    copy.y = src.y + 1;
+    copy.visible = true;
+    if (copy.elements) {
+      copy.elements = copy.elements.map((el, i) => ({
+        ...el,
+        id: `el-${Date.now().toString(36)}-${i}-${Math.random().toString(36).slice(2, 5)}`,
+      }));
+    }
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dashboardWidgets: [...widgets, copy], updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+    return copy;
+  },
+
+  removeDashboardWidget: (id) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    if (!widgets.some((w) => w.id === id)) return;
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = {
+      ...cur,
+      dashboardWidgets: widgets.filter((w) => w.id !== id),
+      updatedAt: Date.now(),
+    };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+  },
+
+  addCardElement: (widgetId, element) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    const nextWidgets = widgets.map((w) => {
+      if (w.id !== widgetId) return w;
+      const nextElements = [...(w.elements ?? []), element];
+      const hasCharts = nextElements.some((el) => el.type.startsWith('chart-'));
+      const minH = hasCharts ? Math.min(16, 5 + nextElements.length * 2) : w.h;
+      return {
+        ...w,
+        type: 'custom' as const,
+        h: Math.max(w.h, minH),
+        w: Math.max(w.w, hasCharts ? 9 : w.w),
+        elements: nextElements,
+      };
+    });
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dashboardWidgets: nextWidgets, updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+  },
+
+  updateCardElement: (widgetId, elementId, patch, recordHistory = true) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    const nextWidgets = widgets.map((w) => {
+      if (w.id !== widgetId) return w;
+      const elements = (w.elements ?? []).map((el) =>
+        el.id === elementId ? { ...el, ...patch } : el,
+      );
+      return { ...w, elements };
+    });
+    const next = { ...cur, dashboardWidgets: nextWidgets, updatedAt: Date.now() };
+    persistActive(next);
+    if (recordHistory) {
+      const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+      setState({ project: next, past, future: [] });
+    } else {
+      setState({ project: next });
+    }
+  },
+
+  reorderCardElements: (widgetId, orderedIds) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    const nextWidgets = widgets.map((w) => {
+      if (w.id !== widgetId || !w.elements) return w;
+      const byId = new Map(w.elements.map((el) => [el.id, el]));
+      const reordered = orderedIds
+        .map((id) => byId.get(id))
+        .filter((x): x is CardElementSchema => Boolean(x));
+      for (const el of w.elements) {
+        if (!orderedIds.includes(el.id)) reordered.push(el);
+      }
+      return { ...w, elements: reordered };
+    });
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dashboardWidgets: nextWidgets, updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+  },
+
+  removeCardElement: (widgetId, elementId) => {
+    const cur = getState().project;
+    const widgets = getNormalizedWidgets(cur);
+    const nextWidgets = widgets.map((w) =>
+      w.id === widgetId
+        ? { ...w, elements: (w.elements ?? []).filter((el) => el.id !== elementId) }
+        : w,
+    );
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dashboardWidgets: nextWidgets, updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+  },
+
+  upsertDataSource: (ds) => {
+    const cur = getState().project;
+    const base = cur.dataSources ?? createDefaultDataSources();
+    const exists = base.some((d) => d.id === ds.id);
+    const nextSources = exists ? base.map((d) => (d.id === ds.id ? ds : d)) : [...base, ds];
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dataSources: nextSources, updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+  },
+
+  removeDataSource: (id) => {
+    if (id === 'builtin-sim') return;
+    const cur = getState().project;
+    const base = cur.dataSources ?? createDefaultDataSources();
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, dataSources: base.filter((d) => d.id !== id), updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
+  },
+
+  setKindTemplateMapping: (kind, templateId) => {
+    const cur = getState().project;
+    const map = { ...(cur.kindTemplateMap ?? {}) };
+    if (templateId) map[kind] = templateId;
+    else delete map[kind];
+    const past = [...getState().past, cloneProject(cur)].slice(-MAX_HISTORY);
+    const next = { ...cur, kindTemplateMap: map, updatedAt: Date.now() };
+    persistActive(next);
+    setState({ project: next, past, future: [] });
   },
 
   addBookmark: (name, position, target) => {

@@ -10,6 +10,8 @@ import { TURBOJET_GLB_URL } from './turbojet/types';
 const STUDIO_MANIFEST_URL = '/assets/studio/manifest.json';
 const studioGlbTemplates = new Map<string, THREE.Object3D>();
 const customGlbTemplates = new Map<string, THREE.Object3D>();
+const remoteGlbTemplates = new Map<string, THREE.Object3D>();
+const remoteGlbLoading = new Set<string>();
 let turbojetTemplate: THREE.Object3D | null = null;
 const assetListeners = new Set<() => void>();
 let studioPreloadStarted = false;
@@ -21,14 +23,42 @@ export function subscribeAssets(fn: () => void): () => void {
   };
 }
 
-export function getAssetSourceKey(kind: CatalogKind | 'CUSTOM_GLB', customGlbId?: string): string {
+export function getAssetSourceKey(
+  kind: CatalogKind | 'CUSTOM_GLB',
+  customGlbId?: string,
+  customGlbUrl?: string,
+): string {
   if (kind === 'CUSTOM_GLB') {
-    return customGlbId && customGlbTemplates.has(customGlbId) ? `custom:${customGlbId}` : 'fallback';
+    if (customGlbId && customGlbTemplates.has(customGlbId)) return `custom:${customGlbId}`;
+    if (customGlbUrl && remoteGlbTemplates.has(customGlbUrl)) return `remote:${customGlbUrl}`;
+    return 'fallback';
   }
   if (kind === 'TEXT') return 'studio-text';
   if (kind === 'TURBOJET') return turbojetTemplate ? 'turbojet' : 'fallback';
   if (studioGlbTemplates.has(kind)) return 'studio';
   return 'fallback';
+}
+
+/** 预留：按 OSS/HTTPS URL 异步预加载远程自定义 GLB 模型并在就绪后触发场景刷新 */
+export function ensureRemoteGlbLoaded(url?: string): void {
+  if (!url) return;
+  if (remoteGlbTemplates.has(url) || remoteGlbLoading.has(url)) return;
+  remoteGlbLoading.add(url);
+  const loader = new GLTFLoader();
+  void loader
+    .loadAsync(url)
+    .then((gltf) => {
+      const root = gltf.scene ?? gltf.scenes[0];
+      if (!root) return;
+      remoteGlbTemplates.set(url, normalizeCustomModel(root));
+      notifyAssetListeners();
+    })
+    .catch(() => {
+      // ignore missing/blocked remote glb
+    })
+    .finally(() => {
+      remoteGlbLoading.delete(url);
+    });
 }
 
 let notifyTimer: number | null = null;
@@ -349,6 +379,7 @@ export function instantiateAssetObject(
     labelText?: string;
     section?: string;
     customGlbId?: string;
+    customGlbUrl?: string;
     colorHex?: string;
     floorStyle?: GroundStyle;
     scale?: Vec3;
@@ -361,9 +392,15 @@ export function instantiateAssetObject(
 
   let obj: THREE.Object3D | null = null;
 
-  if (kind === 'CUSTOM_GLB' && opts.customGlbId) {
-    const tpl = customGlbTemplates.get(opts.customGlbId);
-    if (tpl) obj = cloneWithFreshMaterials(tpl);
+  if (kind === 'CUSTOM_GLB') {
+    const localTpl = opts.customGlbId ? customGlbTemplates.get(opts.customGlbId) : undefined;
+    const remoteTpl = opts.customGlbUrl ? remoteGlbTemplates.get(opts.customGlbUrl) : undefined;
+    const tpl = localTpl ?? remoteTpl;
+    if (tpl) {
+      obj = cloneWithFreshMaterials(tpl);
+    } else if (opts.customGlbUrl) {
+      ensureRemoteGlbLoaded(opts.customGlbUrl);
+    }
   } else if (kind === 'TEXT') {
     obj = buildIndustrialTextSign({
       tag: opts.tag,

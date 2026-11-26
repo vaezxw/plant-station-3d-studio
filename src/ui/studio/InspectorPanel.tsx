@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
 import {
   Activity,
   ArrowLeftRight,
@@ -23,6 +23,7 @@ import {
   type PipeFlowMode,
   type Vec3,
 } from '../../domain/schema';
+import { useCardTemplateStore, BUILTIN_CARD_TEMPLATES } from '../../store/useCardTemplateStore';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useProjectStore } from '../../store/useProjectStore';
 import { POINT_CATALOG, useTelemetryStore } from '../../store/useTelemetryStore';
@@ -223,6 +224,33 @@ const InspectorPanel: FC = () => {
   const triggerCameraView = useEditorStore((s) => s.triggerCameraView);
 
   const valueMap = useTelemetryStore((s) => s.valueMap);
+  const externalDefs = useTelemetryStore((s) => s.externalDefs);
+  const bridgeCatalog = useTelemetryStore((s) => s.bridgeCatalog);
+  const customTemplates = useCardTemplateStore((s) => s.customTemplates);
+  const [extKey, setExtKey] = useState('');
+  const [extLabel, setExtLabel] = useState('');
+  const [extUnit, setExtUnit] = useState('');
+
+  const allAvailablePoints = (() => {
+    const seen = new Set<string>();
+    const list: { id: string; tag: string; name: string; unit: string; source: 'builtin' | 'scada' | 'external' }[] = [];
+    for (const bp of bridgeCatalog) {
+      if (seen.has(bp.id)) continue;
+      seen.add(bp.id);
+      list.push({ id: bp.id, tag: bp.tag ?? 'SCADA', name: bp.name, unit: bp.unit, source: 'scada' });
+    }
+    for (const p of POINT_CATALOG) {
+      if (seen.has(p.id)) continue;
+      seen.add(p.id);
+      list.push({ id: p.id, tag: p.tag, name: p.name, unit: p.unit, source: 'builtin' });
+    }
+    for (const ext of Object.values(externalDefs)) {
+      if (seen.has(ext.id)) continue;
+      seen.add(ext.id);
+      list.push({ id: ext.id, tag: 'EXT', name: ext.name, unit: ext.unit, source: 'external' });
+    }
+    return list;
+  })();
 
   const node = project.nodes.find((n) => n.id === selectedNodeId);
   const pipe = project.pipes.find((p) => p.id === selectedPipeId);
@@ -771,17 +799,20 @@ const InspectorPanel: FC = () => {
               className="w-full h-7 px-2 rounded bg-bg-canvas border border-border-subtle text-xs text-text-secondary focus:outline-none focus:border-border-strong"
             >
               <option value="">+ 添加关联测点...</option>
-              {POINT_CATALOG.filter((p) => !node.pointIds.includes(p.id)).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.tag} · {p.name}
-                </option>
-              ))}
+              {allAvailablePoints
+                .filter((p) => !node.pointIds.includes(p.id))
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.source === 'scada' ? '[SCADA] ' : p.source === 'external' ? '[外部] ' : `${p.tag} · `}
+                    {p.name}
+                  </option>
+                ))}
             </select>
 
             {node.pointIds.length > 0 ? (
               <div className="space-y-1">
                 {node.pointIds.map((pid) => {
-                  const def = POINT_CATALOG.find((p) => p.id === pid);
+                  const def = allAvailablePoints.find((p) => p.id === pid);
                   const pv = valueMap[pid];
                   return (
                     <div
@@ -814,8 +845,101 @@ const InspectorPanel: FC = () => {
                 })}
               </div>
             ) : (
-              <div className="text-[11px] text-text-muted">暂未绑定测点，大屏展示时可联动显示实时数据。</div>
+              <div className="text-[11px] text-text-muted">暂未绑定内置测点，可添加下方外部点号联动。</div>
             )}
+
+            {/* 外部数据源点号扩展槽位 + 绑定专属大屏模板 */}
+            <div className="pt-2 border-t border-border-subtle/50 space-y-1.5">
+              <div className="text-[10px] font-medium text-text-muted">外部数据源点号对接（预留）</div>
+              <div className="grid grid-cols-2 gap-1">
+                <input
+                  value={extKey}
+                  onChange={(e) => setExtKey(e.target.value)}
+                  placeholder="外部点号如 PLC_PT01"
+                  className="h-6 px-1.5 rounded bg-bg-canvas border border-border-subtle text-[11px] font-mono text-text-primary focus:outline-none focus:border-border-strong"
+                />
+                <input
+                  value={extLabel}
+                  onChange={(e) => setExtLabel(e.target.value)}
+                  placeholder="显示名称(选填)"
+                  className="h-6 px-1.5 rounded bg-bg-canvas border border-border-subtle text-[11px] text-text-primary focus:outline-none focus:border-border-strong"
+                />
+              </div>
+              <div className="flex gap-1">
+                <input
+                  value={extUnit}
+                  onChange={(e) => setExtUnit(e.target.value)}
+                  placeholder="单位"
+                  className="w-20 h-6 px-1.5 rounded bg-bg-canvas border border-border-subtle text-[11px] text-text-primary focus:outline-none focus:border-border-strong"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const key = extKey.trim();
+                    if (!key) return;
+                    const existing = node.customPoints ?? [];
+                    if (existing.some((c) => c.key === key)) return;
+                    updateNode(
+                      node.id,
+                      {
+                        customPoints: [
+                          ...existing,
+                          { key, label: extLabel.trim() || key, unit: extUnit.trim() },
+                        ],
+                      },
+                      true,
+                    );
+                    setExtKey('');
+                    setExtLabel('');
+                    setExtUnit('');
+                  }}
+                  className="flex-1 h-6 rounded border border-border-strong bg-accent/15 hover:bg-accent/25 text-accent text-[11px] transition"
+                >
+                  + 绑定外部点号
+                </button>
+              </div>
+              {(node.customPoints ?? []).map((cp) => (
+                <div
+                  key={cp.key}
+                  className="px-2 py-1 rounded bg-bg-canvas/50 border border-border-subtle flex items-center justify-between text-[11px]"
+                >
+                  <span className="truncate font-mono text-text-secondary">
+                    {cp.label} ({cp.key}) {cp.unit ?? ''}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateNode(
+                        node.id,
+                        { customPoints: (node.customPoints ?? []).filter((x) => x.key !== cp.key) },
+                        true,
+                      )
+                    }
+                    className="text-text-muted hover:text-red-400"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <label className="block space-y-1 pt-2 border-t border-border-subtle/50">
+              <span className="text-[11px] text-text-muted">大屏联动专属卡片模板</span>
+              <select
+                value={node.detailTemplateId ?? ''}
+                onChange={(e) =>
+                  updateNode(node.id, { detailTemplateId: e.target.value || undefined }, true)
+                }
+                className="w-full h-7 px-2 rounded bg-bg-canvas border border-border-subtle text-xs text-text-secondary focus:outline-none focus:border-border-strong"
+              >
+                <option value="">自动（跟随设备类型映射）</option>
+                {[...BUILTIN_CARD_TEMPLATES, ...customTemplates].map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           {/* 快捷操作 */}

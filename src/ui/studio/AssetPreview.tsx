@@ -6,10 +6,11 @@ type Props = {
   kind: CatalogKind;
   alt: string;
   hovered?: boolean;
+  className?: string;
 };
 
 /** 资产库模型预览：进入视口后生成高清静态 PNG 缩略图，悬停时激活实时 3D 自转 */
-const AssetPreview: FC<Props> = ({ kind, alt, hovered = false }) => {
+const AssetPreview: FC<Props> = ({ kind, alt, hovered = false, className = 'h-16' }) => {
   const [src, setSrc] = useState<string>('');
   const [visible, setVisible] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -65,7 +66,7 @@ const AssetPreview: FC<Props> = ({ kind, alt, hovered = false }) => {
   return (
     <div
       ref={wrapRef}
-      className="relative w-full h-16 rounded-md overflow-hidden bg-gradient-to-b from-slate-800/55 to-slate-950/85 border border-border-subtle/60 flex items-center justify-center"
+      className={`relative w-full rounded-md overflow-hidden bg-gradient-to-b from-slate-800/55 to-slate-950/85 border border-border-subtle/60 flex items-center justify-center ${className}`}
     >
       {src && !hovered ? (
         <img

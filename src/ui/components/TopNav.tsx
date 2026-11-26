@@ -1,7 +1,9 @@
 import { useRef, type ChangeEvent, type FC } from 'react';
 import {
+  ArrowLeft,
   Box,
   Cable,
+  Database,
   Download,
   FileOutput,
   FolderKanban,
@@ -13,6 +15,7 @@ import {
   Move,
   Palette,
   Redo2,
+  Rocket,
   RotateCw,
   Save,
   Scaling,
@@ -20,10 +23,13 @@ import {
   Unlock,
   Upload,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { ProjectSchema, StudioMode, TransformTool } from '../../domain/schema';
 import { BUILTIN_THEMES } from '../../domain/themes';
+import { captureProjectCompositeSnapshot } from '../../engine/CompositeThumbnail';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useProjectStore } from '../../store/useProjectStore';
+import { useHasPerm } from './AuthGuard';
 
 const MODE_ITEMS: { id: StudioMode; label: string; icon: typeof Box }[] = [
   { id: 'templates', label: '模板中心', icon: FolderKanban },
@@ -41,7 +47,11 @@ const TOOL_ITEMS: { id: TransformTool; label: string; shortcut: string; icon: ty
 ];
 
 const TopNav: FC = () => {
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const canEdit = useHasPerm('project:edit');
+  const canPublish = useHasPerm('scene:publish');
+  const canDs = useHasPerm('datasource:manage');
 
   const project = useProjectStore((s) => s.project);
   const pastCount = useProjectStore((s) => s.past.length);
@@ -67,6 +77,8 @@ const TopNav: FC = () => {
   const toggleCanvasLock = useEditorStore((s) => s.toggleCanvasLock);
   const setThemeId = useEditorStore((s) => s.setThemeId);
   const setThemeModalOpen = useEditorStore((s) => s.setThemeModalOpen);
+  const setDataSourceModalOpen = useEditorStore((s) => s.setDataSourceModalOpen);
+  const setPublishModalOpen = useEditorStore((s) => s.setPublishModalOpen);
 
   if (mode === 'present') return null;
 
@@ -98,21 +110,35 @@ const TopNav: FC = () => {
 
   return (
     <header className="h-12 shrink-0 px-2.5 flex items-center justify-between gap-2 border-b border-border-subtle bg-bg-elevated select-none z-20 overflow-x-auto">
-      {/* 左侧品牌与工程名称 */}
-      <div className="flex items-center gap-2 min-w-0 shrink-0">
+      {/* 左侧返回控制台 + 品牌与工程名称 */}
+      <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+        <button
+          type="button"
+          onClick={() => {
+            void captureProjectCompositeSnapshot(project).then((shot) => {
+              if (shot) updateProjectMeta({ thumbnailDataUrl: shot });
+              navigate('/console/home');
+            });
+          }}
+          title="返回平台首页控制台"
+          className="h-7 px-2 rounded border border-border-subtle bg-bg-canvas/70 hover:bg-bg-hover text-[11px] text-text-secondary hover:text-text-primary flex items-center gap-1 shrink-0 transition"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 text-accent" />
+          <span className="hidden lg:inline">控制台</span>
+        </button>
         <div className="w-7 h-7 rounded-md bg-accent-soft border border-border-strong flex items-center justify-center text-accent font-mono font-bold text-xs shrink-0">
           3D
         </div>
         <input
           value={project.name}
           onChange={(e) => updateProjectMeta({ name: e.target.value })}
-          className="bg-transparent text-xs xl:text-sm font-semibold text-text-primary focus:outline-none focus:bg-bg-hover px-1.5 py-0.5 rounded w-28 xl:w-44 truncate border border-transparent focus:border-border-strong"
+          className="bg-transparent text-xs xl:text-sm font-semibold text-text-primary focus:outline-none focus:bg-bg-hover px-1.5 py-0.5 rounded w-20 xl:w-32 truncate border border-transparent focus:border-border-strong"
           title="点击修改工程名称"
         />
       </div>
 
       {/* 中部工作模式切换 */}
-      <nav className="flex items-center gap-0.5 p-1 rounded-lg bg-bg-canvas/70 border border-border-subtle shrink-0">
+      <nav className="flex items-center gap-0.5 p-0.5 rounded-lg bg-bg-canvas/70 border border-border-subtle shrink-0">
         {MODE_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = mode === item.id;
@@ -121,7 +147,7 @@ const TopNav: FC = () => {
               key={item.id}
               type="button"
               onClick={() => setMode(item.id)}
-              className={`px-2 xl:px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 whitespace-nowrap shrink-0 transition ${
+              className={`px-1.5 xl:px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1 whitespace-nowrap shrink-0 transition ${
                 active
                   ? 'bg-accent text-slate-950 shadow-sm'
                   : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
@@ -217,12 +243,24 @@ const TopNav: FC = () => {
         </div>
       ) : null}
 
-      {/* 右侧：主题与工程保存导出 */}
+      {/* 右侧：发布、主题与工程保存导出 */}
       <div className="flex items-center gap-1 shrink-0">
+        {canPublish ? (
+          <button
+            type="button"
+            onClick={() => setPublishModalOpen(true)}
+            title="发布 3D 大屏并生成 SCADA 嵌入预览链接"
+            className="h-7 px-2.5 rounded border border-border-strong bg-accent hover:brightness-110 text-slate-950 text-xs font-semibold flex items-center gap-1 shadow-sm transition shrink-0"
+          >
+            <Rocket className="w-3.5 h-3.5" />
+            <span>发布预览</span>
+          </button>
+        ) : null}
+
         <select
           value={themeId}
           onChange={(e) => setThemeId(e.target.value)}
-          className="h-7 max-w-[112px] xl:max-w-[148px] px-1.5 rounded bg-bg-canvas border border-border-subtle text-xs text-text-secondary focus:outline-none focus:border-border-strong truncate"
+          className="hidden xl:block h-7 max-w-[136px] px-1.5 rounded bg-bg-canvas border border-border-subtle text-xs text-text-secondary focus:outline-none focus:border-border-strong truncate"
           title="切换主题风格"
         >
           {allThemes.map((t) => (
@@ -232,25 +270,39 @@ const TopNav: FC = () => {
           ))}
         </select>
 
+        {canDs ? (
+          <button
+            type="button"
+            onClick={() => setDataSourceModalOpen(true)}
+            title="SCADA 数据源接入配置"
+            className="h-7 px-2 rounded border border-border-subtle bg-bg-canvas/70 hover:bg-bg-hover text-xs text-text-secondary hover:text-text-primary flex items-center gap-1 transition shrink-0"
+          >
+            <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden xl:inline">数据源</span>
+          </button>
+        ) : null}
+
         <button
           type="button"
           onClick={() => setThemeModalOpen(true)}
           title="自定义设计主题风格"
-          className="h-7 px-2 rounded border border-border-subtle bg-bg-canvas/70 hover:bg-bg-hover text-xs text-text-secondary hover:text-text-primary flex items-center gap-1 transition"
+          className="h-7 px-2 rounded border border-border-subtle bg-bg-canvas/70 hover:bg-bg-hover text-xs text-text-secondary hover:text-text-primary flex items-center gap-1 transition shrink-0"
         >
           <Palette className="w-3.5 h-3.5 text-accent" />
           <span className="hidden xl:inline">自定义主题</span>
         </button>
 
-        <button
-          type="button"
-          onClick={() => void saveCurrentToLibrary()}
-          title="保存到本地工程库"
-          className="h-7 px-2.5 rounded border border-border-strong bg-accent-soft hover:bg-accent hover:text-slate-950 text-xs text-accent font-medium flex items-center gap-1 transition"
-        >
-          <Save className="w-3.5 h-3.5" />
-          <span className="hidden lg:inline">保存</span>
-        </button>
+        {canEdit ? (
+          <button
+            type="button"
+            onClick={() => void saveCurrentToLibrary()}
+            title="保存到本地工程库"
+            className="h-7 px-2 rounded border border-border-subtle bg-bg-canvas/70 hover:bg-bg-hover text-xs text-text-secondary hover:text-text-primary flex items-center gap-1 transition shrink-0"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span className="hidden 2xl:inline">保存</span>
+          </button>
+        ) : null}
 
         <button
           type="button"

@@ -734,6 +734,7 @@ export class SceneCore {
     }
     for (const [id, entry] of this.entries) {
       entry.labelEl.dataset.selected = id === nodeId ? 'true' : 'false';
+      this.refreshLabelVisual(entry);
     }
     if (nodeId) {
       const entry = this.entries.get(nodeId);
@@ -745,6 +746,60 @@ export class SceneCore {
     this.syncTransformAttachment();
   }
 
+  private highlightedSection: string | null = null;
+
+  private refreshLabelVisual(entry: NodeEntry) {
+    const isSel = entry.node.id === this.selectedId;
+    const inSec = Boolean(this.highlightedSection && entry.node.section === this.highlightedSection);
+    const pointKeys = [
+      ...entry.node.pointIds,
+      ...(entry.node.customPoints?.map((c) => c.key) ?? []),
+    ];
+    const hasBad = pointKeys.some((pid) => this.telemetryMap[pid]?.quality === 'BAD');
+
+    if (hasBad) {
+      entry.labelEl.style.borderColor = 'rgba(239,68,68,0.92)';
+      entry.labelEl.style.color = '#fecaca';
+      entry.labelEl.style.background = 'rgba(127,29,29,0.88)';
+    } else if (isSel || inSec) {
+      entry.labelEl.style.borderColor = '#38bdf8';
+      entry.labelEl.style.color = '#ffffff';
+      entry.labelEl.style.background = 'rgba(2,132,199,0.88)';
+    } else {
+      entry.labelEl.style.borderColor = 'rgba(56,189,248,0.45)';
+      entry.labelEl.style.color = '#e0f2fe';
+      entry.labelEl.style.background = 'rgba(15,23,42,0.82)';
+    }
+  }
+
+  highlightSection(section: string | null) {
+    this.highlightedSection = section;
+    const box = new THREE.Box3();
+    let hitCount = 0;
+    for (const entry of this.entries.values()) {
+      this.refreshLabelVisual(entry);
+      if (section && entry.node.section === section && entry.node.visible) {
+        box.expandByObject(entry.object);
+        hitCount++;
+      }
+    }
+    if (section && hitCount > 0 && !box.isEmpty()) {
+      const center = new THREE.Vector3();
+      const size = new THREE.Vector3();
+      box.getCenter(center);
+      box.getSize(size);
+      const dist = Math.max(3.6, size.length() * 1.45);
+      this.flyTo(
+        [center.x + dist * 0.65, center.y + dist * 0.55, center.z + dist * 0.72],
+        [center.x, center.y, center.z],
+      );
+    }
+  }
+
+  setOrbitLocked(locked: boolean) {
+    this.orbit.enabled = !locked;
+  }
+
   setSelectedPipe(pipeId: string | null) {
     this.selectedPipeId = pipeId;
     for (const bp of this.builtPipes.values()) {
@@ -754,6 +809,9 @@ export class SceneCore {
 
   setTelemetryMap(map: Record<string, PointValue>) {
     this.telemetryMap = map;
+    for (const entry of this.entries.values()) {
+      this.refreshLabelVisual(entry);
+    }
   }
 
   private syncTransformAttachment() {
@@ -794,7 +852,7 @@ export class SceneCore {
     }
 
     for (const node of nodes) {
-      const sourceKey = getAssetSourceKey(node.kind, node.customGlbId);
+      const sourceKey = getAssetSourceKey(node.kind, node.customGlbId, node.customGlbUrl);
       const scaleTag =
         node.kind === 'FLOOR_SLAB' || node.kind === 'BASE_PAD'
           ? `${Math.round(node.scale[0] * 2)}:${Math.round(node.scale[2] * 2)}`
@@ -804,7 +862,7 @@ export class SceneCore {
         node.kind === 'PIPE' || node.kind === 'PIPE_ELBOW' || node.kind === 'SIGHT_GLASS'
           ? JSON.stringify(node.pipeFlow ?? null)
           : '';
-      const sig = `${node.kind}|${node.customGlbId ?? ''}|${node.color ?? ''}|${node.floorStyle ?? ''}|${scaleTag}|${textSig}|${pipeFlowSig}|${node.labelText ?? ''}|${sourceKey}`;
+      const sig = `${node.kind}|${node.customGlbId ?? ''}|${node.customGlbUrl ?? ''}|${node.color ?? ''}|${node.floorStyle ?? ''}|${scaleTag}|${textSig}|${pipeFlowSig}|${node.labelText ?? ''}|${sourceKey}`;
       const existing = this.entries.get(node.id);
       if (existing && existing.sig === sig) {
         existing.node = node;
@@ -832,6 +890,7 @@ export class SceneCore {
         labelText: node.labelText ?? node.tag,
         section: node.section,
         customGlbId: node.customGlbId,
+        customGlbUrl: node.customGlbUrl,
         colorHex: node.color,
         floorStyle: node.floorStyle,
         scale: node.scale,
@@ -1095,6 +1154,27 @@ export class SceneCore {
       position: [Number(p.x.toFixed(2)), Number(p.y.toFixed(2)), Number(p.z.toFixed(2))],
       target: [Number(t.x.toFixed(2)), Number(t.y.toFixed(2)), Number(t.z.toFixed(2))],
     };
+  }
+
+  captureThumbnailDataUrl(maxWidth = 480): string | undefined {
+    if (this.disposed) return undefined;
+    try {
+      this.renderer.render(this.scene, this.camera);
+      const src = this.renderer.domElement;
+      if (!src.width || !src.height) return undefined;
+      const scale = Math.min(1, maxWidth / src.width);
+      const w = Math.max(160, Math.round(src.width * scale));
+      const h = Math.max(90, Math.round(src.height * scale));
+      const offscreen = document.createElement('canvas');
+      offscreen.width = w;
+      offscreen.height = h;
+      const ctx = offscreen.getContext('2d');
+      if (!ctx) return undefined;
+      ctx.drawImage(src, 0, 0, w, h);
+      return offscreen.toDataURL('image/jpeg', 0.8);
+    } catch {
+      return undefined;
+    }
   }
 
   applyCameraPreset(view: CameraPresetView) {

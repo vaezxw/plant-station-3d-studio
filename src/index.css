@@ -13,8 +13,116 @@
   --text-secondary: #cbd5e1;
   --text-muted: #64748b;
   --accent: #38bdf8;
-  --accent-soft: rgba(56, 189, 248, 0.16);
-  --accent-glow: rgba(56, 189, 248, 0.35);
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --accent-glow: rgba(56, 189, 248, 0.32);
+  --accent-fg: #04101f;
+}
+
+/* 浅色主题下自动保护所有实心 bg-accent 主按钮的文字可读性，并增强白卡质感 */
+html[data-theme-mode='light'] .bg-accent.text-slate-950,
+html[data-theme-mode='light'] .hover\:bg-accent:hover.hover\:text-slate-950 {
+  color: var(--accent-fg) !important;
+}
+
+html[data-theme-mode='light'] .shadow-sm,
+html[data-theme-mode='light'] .rounded-2xl.bg-bg-panel {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 18px -6px rgba(15, 23, 42, 0.06);
+}
+
+/* ============================================================================
+   Liquid Glass 液态光学玻璃主题专属细节增强
+   ============================================================================ */
+html[data-theme-id='liquid-glass'] .studio-glass,
+html[data-theme-id='liquid-glass'] .bg-bg-panel,
+html[data-theme-id='liquid-glass'] .bg-bg-elevated {
+  backdrop-filter: blur(30px) saturate(205%) brightness(1.04);
+  -webkit-backdrop-filter: blur(30px) saturate(205%) brightness(1.04);
+}
+
+/* 液态玻璃卡片：外亮白切面 + 顶部镜面高光条 + 柔和多维浮空投影 */
+html[data-theme-id='liquid-glass'] .rounded-2xl.bg-bg-panel,
+html[data-theme-id='liquid-glass'] .rounded-xl.bg-bg-panel,
+html[data-theme-id='liquid-glass'] .rounded-2xl.bg-bg-elevated,
+html[data-theme-id='liquid-glass'] .studio-glass {
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    inset 1px 0 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(15, 38, 86, 0.05),
+    0 12px 34px -12px rgba(15, 38, 86, 0.16),
+    0 2px 6px rgba(15, 38, 86, 0.05);
+}
+
+html[data-theme-id='liquid-glass'] .rounded-2xl.bg-bg-panel:hover {
+  background-color: rgba(255, 255, 255, 0.56);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 16px 38px -12px rgba(0, 122, 255, 0.22),
+    0 3px 8px rgba(15, 38, 86, 0.06);
+}
+
+/* 悬浮玻璃侧边舱：高透极光透射 + 立体亮边 */
+html[data-theme-id='liquid-glass'] aside.bg-bg-panel {
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 1px 0 0 rgba(255, 255, 255, 0.7),
+    inset -1px 0 0 rgba(255, 255, 255, 0.55),
+    0 16px 40px -14px rgba(15, 38, 86, 0.18);
+}
+
+/* 穿透滚动顶部玻璃导航栏：允许下方卡片滚过并实时磨砂折射 */
+html[data-theme-id='liquid-glass'] header.bg-bg-elevated {
+  border-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(34px) saturate(215%) brightness(1.05);
+  -webkit-backdrop-filter: blur(34px) saturate(215%) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.55),
+    0 12px 32px -12px rgba(15, 38, 86, 0.15);
+}
+
+/* 定制主题下拉弹出面板高可读晶透玻璃层 */
+html[data-theme-id='liquid-glass'] .theme-switcher-popover {
+  background-color: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(36px) saturate(210%);
+  -webkit-backdrop-filter: blur(36px) saturate(210%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 20px 48px -12px rgba(15, 38, 86, 0.24);
+}
+
+/* 侧栏激活菜单项：液态晶莹浮起胶囊 */
+html[data-theme-id='liquid-glass'] nav button.bg-accent-soft {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(235, 244, 255, 0.72) 100%);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 6px 16px -4px rgba(0, 122, 255, 0.22),
+    0 1px 3px rgba(15, 38, 86, 0.06);
+}
+
+/* 液态主按钮光泽与柔光溢彩 */
+html[data-theme-id='liquid-glass'] button.bg-accent {
+  background: linear-gradient(180deg, #1d8cff 0%, #006ce6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 6px 18px -4px rgba(0, 122, 255, 0.45);
+}
+
+/* 内嵌次级卡片与输入框呈现清透微凹玻璃 */
+html[data-theme-id='liquid-glass'] .bg-bg-canvas:not(body):not(#root):not(.console-shell-root) {
+  background-color: rgba(242, 247, 255, 0.48);
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 1px 2px rgba(15, 38, 86, 0.04);
+}
+
+html[data-theme-id='liquid-glass'] input.bg-bg-canvas:focus {
+  background-color: rgba(255, 255, 255, 0.84);
+  border-color: rgba(0, 122, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.14);
 }
 
 html,
@@ -32,6 +140,13 @@ body,
 
 * {
   box-sizing: border-box;
+}
+
+/* 切换全局主题瞬间禁用所有元素的过渡动画，确保所有背景/边框/文字在同一帧同步生效、避免黑底黑字撕裂 */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
 }
 
 .studio-glass {
